@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  background: #eff3f8;
+}
+
+@import 'app/generic-form/style/generic-form';
+
+
+button.angular-stuff{
+  margin-right: 10px;
+
+  display: inline-block;
+  background-color: #135ea7;
+  color: white;
+  height: 28px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Helvetica Neue, Helvetica, Arial, serif;
+  border-radius: 15px;
+  padding: 5px 30px;
+  border: none;
+
+}
