@@ -4,7 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --disable-host-check",
-    "build": "ng build",
+    "build:pre": "if [ -d 'docs' ]; then rm -rf docs; fi",
+    "build:post": "cp -a dist/misc.angular-stuff docs",
+    "build": "npm run build:pre && ng build --base-href /misc.angular-stuff/ && npm run build:post",
     "watch": "ng build --watch --configuration development",
     "test": "jest --watch"
   },

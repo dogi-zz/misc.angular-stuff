@@ -41,7 +41,8 @@ export class AppComponent implements OnInit {
   }
 
   public setParams(params: { [key: string]: string }) {
-    const url = `${window.location.protocol}//${window.location.host}?${Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&')}`;
+    const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&')}`;
+    console.info({url})
     window.history.replaceState({}, '', url);
   }
 
