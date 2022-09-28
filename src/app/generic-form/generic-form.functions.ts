@@ -1,7 +1,103 @@
-import {BehaviorSubject, Observable} from 'rxjs';
-import {FormDefElement, FormDefinition, FormModel, FormModelValue, FormValidationResult, FormValidationResultValue, ValidationTexts} from './generic-form.data';
-import {UiConverters} from "./generic-form.module";
+import {combineLatest, filter, Observable, Subscriber, Subscription} from 'rxjs';
+import {FormDefElement, FormDefElementSelectOption, FormDefinition, FormModel, FormModelValue, FormValidationResult, ValidationTexts} from './generic-form.data';
+import {UiConverters} from './generic-form.definitions';
 
+
+export type GenericFormState = {
+  observableChanges?: boolean,
+  unknownValues: { path: string, value: any }[],
+  selectionOptions: { path: any, observable: Observable<any>, options: FormDefElementSelectOption[] }[],
+};
+
+export type GenericFormCheckResult = { model: FormModel, state: GenericFormState };
+
+
+class DcReplaySubject<T> extends Observable<T> {
+  private observers: Subscriber<T>[] = [];
+  public value: T;
+  private haveValue = false;
+
+  private updatePromises: ((item: T) => void)[] = [];
+
+  private onStart: () => void;
+  private onStop: () => void;
+
+  constructor(startValue?: T) {
+    super((observer) => {
+      this.observers.push(observer);
+      if (this.haveValue) {
+        observer.next(this.value);
+      }
+      if (this.observers.length === 1 && this.onStart) {
+        this.onStart();
+      }
+      return {
+        unsubscribe: () => {
+          this.observers = this.observers.filter((o) => o !== observer);
+          if (this.observers.length === 0 && this.onStop) {
+            this.onStop();
+          }
+        },
+      };
+    });
+    if (startValue !== undefined) {
+      setTimeout(() => {
+        this.next(startValue);
+      });
+    }
+  }
+
+  public getFromNow(): Observable<T> {
+    if (this.haveValue) {
+      let firstValueReceived = false;
+      return this.pipe(filter(() => {
+        if (firstValueReceived) {
+          return true;
+        } else {
+          firstValueReceived = true;
+          return false;
+        }
+      }));
+    } else {
+      return this;
+    }
+  }
+
+  public setActions(onStart: () => void, onStop: () => void) {
+    this.onStart = onStart;
+    this.onStop = onStop;
+    if (this.observers.length && this.onStart) {
+      this.onStart();
+    }
+  }
+
+  public next(value: T) {
+    this.haveValue = true;
+    this.value = value;
+    this.observers.forEach((o) => {
+      try {
+        o.next(this.value);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    this.updatePromises.splice(0).forEach((res) => {
+      try {
+        res(this.value);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  public isNew() {
+    return !this.haveValue;
+  }
+
+  public getNextAsPromise(): Promise<T> {
+    return new Promise((res) => this.updatePromises.push(res));
+  }
+}
 
 export const optionDefinitionToPromise = <T>(value: T | Promise<T> | Observable<T>) => {
   if (value instanceof Promise) {
@@ -11,11 +107,7 @@ export const optionDefinitionToPromise = <T>(value: T | Promise<T> | Observable<
     return new Promise<T>(res => {
       const subscription = value.subscribe(val => {
         res(val);
-        if (subscription) {
-          subscription.unsubscribe();
-        } else {
-          setTimeout(() => subscription?.unsubscribe());
-        }
+        setTimeout(() => subscription?.unsubscribe());
       });
     });
   }
@@ -24,17 +116,124 @@ export const optionDefinitionToPromise = <T>(value: T | Promise<T> | Observable<
 
 export const optionDefinitionToObservable = <T>(value: T | Promise<T> | Observable<T>) => {
   if (value instanceof Promise) {
-    const behaviorSubject = new BehaviorSubject<T>(null);
-    value.then(v => behaviorSubject.next(v));
-    return behaviorSubject;
+    const replaySubject = new DcReplaySubject<T>();
+    value.then(v => replaySubject.next(v));
+    return replaySubject;
   }
   if (value instanceof Observable) {
     return value;
   }
-  return new BehaviorSubject<T>(value);
+  return new DcReplaySubject<T>(value);
 };
 
-const getCheckedFormModelValue = async (def: FormDefElement, modelValue: FormModelValue, keepUnknown: boolean) => {
+export const observableToPromise = <T>(observable: Observable<T>, filter?: (subject: T) => boolean, timeout?: number) => {
+  return new Promise<T>(res => {
+    let firstRun = true;
+    let to = null;
+    const subscription = observable.subscribe((next) => {
+      if (firstRun && (!filter || filter(next))) {
+        firstRun = false;
+        if (to) {
+          clearTimeout(to);
+        }
+        res(next);
+        to = setTimeout(() => subscription.unsubscribe());
+      }
+    });
+    if (timeout) {
+      to = setTimeout(() => subscription.unsubscribe(), timeout);
+    }
+  });
+};
+
+
+export const getCheckedFormModelObservable: (formDef: FormDefinition, model: FormModel, state?: GenericFormState) => Observable<GenericFormCheckResult> =
+  (formDef, model, state) => {
+    state = state || {
+      observableChanges: false,
+      unknownValues: [],
+      selectionOptions: [],
+    };
+
+    let actualFormModel = getCheckedFormModelSync('', formDef, model, state);
+
+    let subscribers: Subscriber<GenericFormCheckResult>[] = [];
+    let subscription: Subscription;
+    return new Observable<GenericFormCheckResult>(subscriber => {
+      subscriber.next({model: actualFormModel, state});
+      subscribers.push(subscriber);
+
+      if (subscribers.length === 1) {
+        subscription = combineLatest(state.selectionOptions.map(v => v.observable)).subscribe((valuesResults) => {
+          state.selectionOptions.forEach((v, i) => v.options = valuesResults[i]);
+          actualFormModel = getCheckedFormModelSync('', formDef, model, state);
+          subscribers.forEach(s => s.next({model: actualFormModel, state}));
+        });
+      }
+
+      return {
+        unsubscribe() {
+          subscribers = subscribers.filter(s => s !== subscriber);
+          if (!subscribers.length) {
+            subscription?.unsubscribe();
+          }
+        },
+      };
+    });
+  };
+
+export const getCheckedFormModelPromise: (formDef: FormDefinition, model: FormModel, state?: GenericFormState) => Promise<GenericFormCheckResult> =
+  async (formDef, model, state) => {
+    state = state || {
+      observableChanges: false,
+      unknownValues: [],
+      selectionOptions: [],
+    };
+
+    state.observableChanges = false;
+    const result = getCheckedFormModelSync('', formDef, model, state);
+    if (state.observableChanges) {
+      return Promise.all(state.selectionOptions.map(({observable}) => observableToPromise(observable))).then((values) => {
+        state.selectionOptions.forEach((v, i) => v.options = values[i]);
+        const newResult = getCheckedFormModelSync('', formDef, model, state);
+        return {model: newResult, state};
+      });
+    } else {
+      return {model: result, state};
+    }
+
+  };
+
+const getCheckedFormModelSync: (path: string, formDef: FormDefinition, model: FormModel,  state: GenericFormState) => FormModel =
+  (path, formDef, model,  state) => {
+    state.unknownValues = state.unknownValues.filter(uv => uv.path !== path);
+
+    const resultItem: any = {};
+    const knownProperties: string[] = [];
+
+    if (!model || typeof model !== 'object' || Array.isArray(model)) {
+      model = {};
+    }
+
+    // Primitives
+    for (const [prop, def] of Object.entries(formDef)) {
+      knownProperties.push(prop);
+      resultItem[prop] = getCheckedFormModelValue(`${path}.${prop}`, def, model[prop], state);
+    }
+
+    Object.entries(model).forEach(([prop, value]) => {
+      if (!knownProperties.includes(prop)) {
+        state.unknownValues.push({path: `${path}.${prop}`, value});
+      }
+    });
+
+    return resultItem;
+  };
+
+
+const getCheckedFormModelValue = (path: string, def: FormDefElement, modelValue: FormModelValue, state: GenericFormState) => {
+  modelValue = modelValue ?? state.unknownValues.find(uv => uv.path === path)?.value;
+  state.unknownValues = state.unknownValues.filter(uv => uv.path !== path);
 
   // Primitives
   if (def.type === 'text') {
@@ -50,8 +249,21 @@ const getCheckedFormModelValue = async (def: FormDefElement, modelValue: FormMod
     return typeof modelValue === 'boolean' ? modelValue : null;
   }
   if (def.type === 'selection') {
-    const options = await optionDefinitionToPromise(def.options);
-    return options.some(option => modelValue === option.value) || keepUnknown ? modelValue : null;
+    let options: FormDefElementSelectOption[];
+    const optionsSelection = state.selectionOptions.find(so => so.path === path);
+    if (optionsSelection) {
+      options = optionsSelection.options;
+    } else {
+      state.observableChanges = true;
+      state.selectionOptions.push({path, observable: optionDefinitionToObservable(def.options), options: []});
+      options = [];
+    }
+    if (options.some(option => modelValue === option.value)) {
+      return modelValue;
+    } else {
+      state.unknownValues.push({path, value: modelValue});
+      return null;
+    }
   }
 
   // Nested
@@ -66,7 +278,7 @@ const getCheckedFormModelValue = async (def: FormDefElement, modelValue: FormMod
     if (childModel === null) {
       return null;
     } else {
-      return getCheckedFormModel(def.properties, childModel, keepUnknown);
+      return getCheckedFormModelSync(path, def.properties, childModel, state);
     }
   }
 
@@ -76,8 +288,9 @@ const getCheckedFormModelValue = async (def: FormDefElement, modelValue: FormMod
       return def.required ? [] : null;
     } else {
       const result = [];
-      for (const childModel of (modelValue as any[])) {
-        const checkedModel = await getCheckedFormModelValue(def.elements, childModel, keepUnknown);
+      for (let i = 0; i < (modelValue as any[]).length; i++) {
+        const childModel = (modelValue as any[])[i];
+        const checkedModel = getCheckedFormModelValue(`${path}.${i}`, def.elements, childModel, state);
         result.push(checkedModel);
       }
       return result;
@@ -87,126 +300,105 @@ const getCheckedFormModelValue = async (def: FormDefElement, modelValue: FormMod
   return null;
 };
 
-export const getCheckedFormModel: (formDef: FormDefinition, model: FormModel, keepUnknown: boolean) => Promise<FormModel> =
-  async (formDef, model, keepUnknown) => {
-    const resultItem: any = {};
-    const knownProperties: string[] = [];
 
-    if (!model || typeof model !== 'object' || Array.isArray(model)) {
-      model = {};
-    }
-
-    // Primitives
-    for (const [prop, def] of Object.entries(formDef)) {
-      knownProperties.push(prop);
-      resultItem[prop] = await getCheckedFormModelValue(def, model[prop], keepUnknown);
-    }
-
-    if (keepUnknown) {
-      Object.entries(model).forEach(([prop, value]) => {
-        if (!knownProperties.includes(prop)) {
-          resultItem[prop] = value;
-        }
-      });
-    }
-
-    return resultItem;
+export const getValidationResult = (path: string, formDef: FormDefinition, model: FormModel, state?: GenericFormState) => {
+  state = state || {
+    observableChanges: false,
+    unknownValues: [],
+    selectionOptions: [],
   };
 
-
-const getValidationValueResult = async (def: FormDefElement, value: any) => {
-  if ((value ?? null) === null) {
-    if (def.required) {
-      return ValidationTexts.required;
-    }
-    return null;
-  }
-
-  if (def.type === 'text') {
-    if (typeof value !== 'string') {
-      return ValidationTexts.typeError;
-    }
-  }
-
-  if (def.type === 'number' || def.type === 'integer') {
-    if (typeof value !== 'number') {
-      return ValidationTexts.typeError;
-    }
-    if (isNaN(value)) {
-      return ValidationTexts.typeError;
-    }
-    if (typeof def.min === 'number' && value < def.min) {
-      return ValidationTexts.numberMin.replace('${}', `${UiConverters.number.toString(def.min)}`);
-    }
-    if (typeof def.max === 'number' && value > def.max) {
-      return ValidationTexts.numberMax.replace('${}', `${UiConverters.number.toString(def.max)}`);
-    }
-  }
-
-  if (def.type === 'boolean') {
-    if (typeof value !== 'boolean') {
-      return ValidationTexts.typeError;
-    }
-  }
-
-  if (def.type === 'selection') {
-    const options = await optionDefinitionToPromise(def.options);
-    if (!options.some(option => value === option.value)) {
-      return ValidationTexts.optionError;
-    }
-  }
-
-  if (def.type === 'object') {
-    if (typeof value !== 'object' || Array.isArray(value)) {
-      return ValidationTexts.typeError;
-    }
-    const childResult = await getValidationResult(def.properties, value);
-    if (Object.keys(childResult).length) {
-      if (typeof childResult === 'object') {
-        return {type: 'object', value: childResult} as FormValidationResultValue;
-      }
-      return childResult as string;
-    }
-  }
-
-
-  if (def.type === 'array') {
-    if (!Array.isArray(value)) {
-      return ValidationTexts.typeError;
-    }
-    const result: FormValidationResultValue = {type: 'array',  value: []};
-    if (typeof def.minLength === 'number') {
-      if (value.length < def.minLength) {
-        result.error = ValidationTexts.arrayMin.replace('${}', `${UiConverters.number.toString(def.minLength)}`);
-      }
-    }
-    if (typeof def.maxLength === 'number') {
-      if (value.length > def.maxLength) {
-        result.error = ValidationTexts.arrayMax.replace('${}', `${UiConverters.number.toString(def.maxLength)}`);
-      }
-    }
-    for (let i = 0; i < value.length; i++) {
-      result.value[i] = await getValidationValueResult(def.elements, value[i]);
-    }
-    if (result.error || result.value.some(v => !!v)) {
-      return result;
-    }
-  }
-
-  return null as FormValidationResultValue;
-};
-
-export const getValidationResult = async (formDef: FormDefinition, model: FormModel) => {
   const validationResult: FormValidationResult = {};
 
   for (const [prop, def] of Object.entries(formDef)) {
-    const validationValueResult = await getValidationValueResult(def, model[prop]);
-    if (validationValueResult) {
-      validationResult[prop] = validationValueResult;
-    }
+    getValidationValueResult(validationResult, `${path}.${prop}`, def, model[prop], state);
   }
 
   return validationResult;
 };
 
+
+const getValidationValueResult = (validationResult: FormValidationResult, path: string, def: FormDefElement, value: any, state: GenericFormState) => {
+  value = value ?? state.unknownValues.find(uv => uv.path === path)?.value;
+
+  if ((value ?? null) === null) {
+    if (def.required) {
+      validationResult[path] = ValidationTexts.required;
+      return;
+    }
+    return;
+  }
+
+  if (def.type === 'text') {
+    if (typeof value !== 'string') {
+      validationResult[path] = ValidationTexts.typeError;
+      return;
+    }
+  }
+
+  if (def.type === 'number' || def.type === 'integer') {
+    if (typeof value !== 'number') {
+      validationResult[path] = ValidationTexts.typeError;
+      return;
+    }
+    if (isNaN(value)) {
+      validationResult[path] = ValidationTexts.NaN;
+      return;
+    }
+    if (typeof def.min === 'number' && value < def.min) {
+      validationResult[path] = ValidationTexts.numberMin.replace('${}', `${UiConverters.number.toString(def.min)}`);
+      return;
+    }
+    if (typeof def.max === 'number' && value > def.max) {
+      validationResult[path] = ValidationTexts.numberMax.replace('${}', `${UiConverters.number.toString(def.max)}`);
+      return;
+    }
+  }
+
+  if (def.type === 'boolean') {
+    if (typeof value !== 'boolean') {
+      validationResult[path] = ValidationTexts.typeError;
+      return;
+    }
+  }
+
+  if (def.type === 'selection') {
+    const options = state.selectionOptions.find(so => so.path === path)?.options || [];
+    if (!options.some(option => value === option.value)) {
+      validationResult[path] = ValidationTexts.optionError;
+      return;
+    }
+  }
+
+  if (def.type === 'object') {
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      validationResult[path] = ValidationTexts.typeError;
+      return;
+    }
+    const childResult = getValidationResult(path, def.properties, value, state);
+    Object.assign(validationResult, childResult);
+  }
+
+
+  if (def.type === 'array') {
+    if (!Array.isArray(value)) {
+      validationResult[path] = ValidationTexts.typeError;
+      return;
+    }
+    if (typeof def.minLength === 'number') {
+      if (value.length < def.minLength) {
+        validationResult[path] = ValidationTexts.arrayMin.replace('${}', `${UiConverters.number.toString(def.minLength)}`);
+      }
+    }
+    if (typeof def.maxLength === 'number') {
+      if (value.length > def.maxLength) {
+        validationResult[path] = ValidationTexts.arrayMax.replace('${}', `${UiConverters.number.toString(def.maxLength)}`);
+      }
+    }
+    for (let i = 0; i < value.length; i++) {
+      getValidationValueResult(validationResult, `${path}.${i}`, def.elements, value[i], state);
+    }
+  }
+
+};
 

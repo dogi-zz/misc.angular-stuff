@@ -22,7 +22,7 @@ export const formDef1: FormDefinition = {
   },
   workState: {
     type: 'selection',
-    caption: 'workState',
+    caption: 'Work-State',
     options: [
       {label: 'unknown', value: null},
       {label: 'Employed', value: 'employed'},
@@ -30,30 +30,28 @@ export const formDef1: FormDefinition = {
     ],
     help: 'none required selection',
   },
-  age_1: {
-    caption: 'Age 1', type: 'integer',
+  age: {
+    caption: 'Age', type: 'integer',
+    min: 18,
     max: 99,
-    help: 'validation < 99',
-  },
-  age_2: {
-    caption: 'Age 2', type: 'integer',
-    required: true, min: 18,
-    help: 'validation > 18',
+    help: '18 <= age <= 99',
   },
   weight_1: {
     caption: 'Weight 1', type: 'number',
+    min: 0,
+    max: 100,
     help: 'validation < 100',
+  },
+  weight_2: {
+    caption: 'Weight 2', type: 'number',
+    required: true,
+    help: 'required non validated',
   },
   bool_1: {
     caption: 'Boolean 1', type: 'boolean',
   },
   bool_2: {
     caption: 'Boolean 2', type: 'boolean', required: true,
-  },
-  weight_2: {
-    caption: 'Weight 2', type: 'number',
-    required: true,
-    help: 'this is required',
   },
   child_1: {
     caption: 'Child 1', type: 'object',
@@ -71,21 +69,6 @@ export const formDef1: FormDefinition = {
   },
   child_2: {
     caption: 'Child 2', type: 'object',
-    required: true,
-    properties: {
-      posX: {
-        caption: 'Pos X', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-      posY: {
-        caption: 'Pos Y', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-    },
-    help: 'required nested object',
-  },
-  child_3: {
-    caption: 'Child 3', type: 'object',
     required: false,
     properties: {
       posX: {
@@ -98,20 +81,6 @@ export const formDef1: FormDefinition = {
       },
     },
     help: 'none required nested object with init value',
-  },
-  child_4: {
-    type: 'object',
-    inline: true,
-    properties: {
-      posX: {
-        caption: 'Inline Child Pos X', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-      posY: {
-        caption: 'Inline Child Pos Y', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-    },
   },
   array_1: {
     caption: 'Array 1', type: 'array',
@@ -136,7 +105,7 @@ export const formDef1: FormDefinition = {
 export const model1: any = {
   extraData: 'foo',
   bool_1: true,
-  child_3: {
+  child_2: {
     posX: -2,
   },
   workState: 'employed',

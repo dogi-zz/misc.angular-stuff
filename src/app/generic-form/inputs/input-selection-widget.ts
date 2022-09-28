@@ -23,7 +23,7 @@ const checkSearchString = (search: string, option: string) => {
              (blur)="onSelectionLeave()"
              (keydown)="onKeyDown($event)"/>
       <div>
-        <button (click)="onSelectionButton()" tabindex="-1">▼</button>
+        <button (mousedown)="onSelectionButton()" tabindex="-1">▼</button>
       </div>
     </div>
     <div *ngIf="filteredOptions" class="form-by-def-input-select-options" #selectionWindow>
@@ -50,6 +50,11 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
 
   @Input() public value!: any;
   @Output() public valueChange = new EventEmitter<any>();
+
+  @Output() public onFocus = new EventEmitter<void>();
+  @Output() public onBlur = new EventEmitter<void>();
+
+
 
   @Input() public options: FormDefElementSelectOption[] | Promise<FormDefElementSelectOption[]> | Observable<FormDefElementSelectOption[]>;
 
@@ -108,6 +113,7 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
   }
 
   public onSelectionFocus() {
+    this.onFocus.emit();
     if (!this.selectionOptions) {
       this.openSelection().then();
     }
@@ -135,15 +141,25 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
   public selectOption(option: FormDefElementSelectOption) {
     // ... onSelectionLeave() does the rest
     this.filteredOptions = [option];
-    this.selectionSearchInput = option.label
+    this.selectionSearchInput = option.label;
   }
 
   public onSelectionLeave() {
+    if (!this.filteredOptions) {
+      return;
+    }
     if (this.filteredOptions.length === 1) {
-      const value = this.filteredOptions[0].value;
-      setTimeout(() => this.valueChange.next(value));
+      const option = this.filteredOptions[0];
+      const value = option.value;
+      setTimeout(() => {
+        this.selectionSearchInput = option.label || '';
+        this.valueChange.next(value);
+        this.onBlur.emit();
+      });
     } else {
+      this.selectionSearchInput = this.filteredOptions[0].label || '';
       this.value$.next(this.value);
+      this.onBlur.emit();
     }
     this.closeSelection();
   }
@@ -193,13 +209,14 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
       this.cursorIndex = this.cursorIndex - 1;
     }
     if ($event.key === 'Enter') {
+      console.info('HIER', this.cursorIndex);
       if (this.filteredOptions?.length && this.filteredOptions[this.cursorIndex]) {
         this.filteredOptions = this.filteredOptions.slice(this.cursorIndex, this.cursorIndex + 1);
         this.selectionInput.nativeElement.blur();
       }
     }
     if ($event.key === 'Escape') {
-     this.selectionInput.nativeElement.blur();
+      this.selectionInput.nativeElement.blur();
     }
   }
 }

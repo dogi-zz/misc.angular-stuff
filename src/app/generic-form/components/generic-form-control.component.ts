@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {ControlDef} from '../generic-form.component';
-import {UiTexts} from '../generic-form.module';
+import {FormValidationResult} from '../generic-form.data';
+import {UiTexts} from '../generic-form.definitions';
 
 @Component({
   selector: '[generic-form-control]',
@@ -16,10 +17,10 @@ import {UiTexts} from '../generic-form.module';
 
 
     <div class="form-by-def-input-div"
-         generic-form-input [control]="control" (inputValue)="inputValue.emit($event)">
+         generic-form-input [control]="control" (inputValue)="inputValue.emit($event)" [validationResult]="validationResult">
     </div>
 
-    <div class="form-by-def-error" *ngIf="control.error && control.element.type !== 'object'">{{control.error}}</div>
+    <div class="form-by-def-error" *ngIf="validationResult[control.path] && control.element.type !== 'object'">{{validationResult[control.path]}}</div>
 
     <div class="form-by-def-remove-button" *ngIf="control.element.type === 'object' && !control.element.required && (control.value$|async)">
       <button (mouseenter)="control.hover = 'delete'" (mouseleave)="control.hover = null"
@@ -40,6 +41,10 @@ export class GenericFormControlComponent implements OnInit, OnChanges {
 
   @Input()
   public control: ControlDef & { hover?: 'delete' | 'add' };
+
+  @Input()
+  public validationResult: FormValidationResult;
+
 
   @Output()
   public inputValue = new EventEmitter<any>();

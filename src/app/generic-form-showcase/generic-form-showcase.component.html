@@ -1,11 +1,13 @@
 <h1>Generic Form</h1>
 
 <button class="angular-stuff" (click)="changeForm('form1')">Basic Data</button>
-<button class="angular-stuff" (click)="changeForm('form2')">Some Arrays</button>
+<button class="angular-stuff" (click)="changeForm('form2')">Sub-Forms</button>
+<button class="angular-stuff" (click)="changeForm('form3')">Selection</button>
+<button class="angular-stuff" (click)="changeForm('form4')">Arrays</button>
 
 <hr/>
 
-<div style="display: flex" #form1>
+<div style="display: flex; min-height: 200px" #form1>
 
   <div style="flex: 1;">
     <generic-form *ngIf="!editMode" [formDef]="formDef" [model]="model" (modelChange)="modelChange($event)"></generic-form>
@@ -13,8 +15,10 @@
   </div>
 
   <div [ngStyle]="{width: width + 'px'}">
-    <pre *ngIf="!editMode"
-         style="border: 1px solid gray; margin-left: 10px; overflow: scroll; width: calc( 100% - 10px ); height: calc( 100% - 25px )">{{model_string}}</pre>
+    <pre class="model-result" *ngIf="!editMode"
+         style="border: 1px solid gray; margin-left: 10px; overflow: scroll; width: calc( 100% - 10px ); height: 100px">{{model_input_string}}</pre>
+    <pre class="model-result" *ngIf="!editMode"
+         style="border: 1px solid gray; margin-left: 10px; overflow: scroll; width: calc( 100% - 10px ); height: calc( 100% - 135px )">{{model_string}}</pre>
     <textarea *ngIf="editMode" [(ngModel)]="modelJson" style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
   </div>
 
@@ -48,3 +52,11 @@
 
 
 <hr/>
+
+
+<div *ngIf="selectOptionsObservable">
+  <div style="margin: 10px 0">
+    Update the Observable with the Options below: <button (click)="form3UpdateSelection()">update</button>
+  </div>
+  <input type="text" style="width: calc(100% - 20px)" [(ngModel)]="selectOptionsJson"/>
+</div>

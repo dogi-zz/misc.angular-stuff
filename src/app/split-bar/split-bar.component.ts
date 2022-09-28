@@ -31,9 +31,12 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
   @Input()
   public positionRight: number ;
 
-
   @Input()
   public outsideIntervalTime: number = 200;
+
+  @Input()
+  public stickVisibility: boolean = false;
+
 
   @Output()
   public newPosition = new EventEmitter<{left: number, right: number}>();
@@ -69,20 +72,23 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
     if (changes.container) {
       this.initContainer();
     }
-    if (changes.position) {
+    if (changes.positionLeft || changes.positionRight    ) {
       this.checkPosition();
     }
   }
 
   private initContainer() {
     if (this.container && this.bar?.nativeElement) {
-      this.container.style.position = 'relative';
+      if (!['relative', 'absolute', 'fixed'].includes(this.container.style.position) ){
+        this.container.style.position = 'relative';
+      }
 
       this.bar.nativeElement.style.position = 'absolute';
+      this.bar.nativeElement.style.pointerEvents = 'initial';
       this.bar.nativeElement.style.top = '0';
       this.bar.nativeElement.style.bottom = '0';
 
-      this.bar.nativeElement.style.opacity = '0';
+      this.bar.nativeElement.style.opacity = this.stickVisibility ? '1' : '0';
       this.checkPosition();
     }
   }
@@ -104,11 +110,11 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   public mouseEnter() {
-    this.bar.nativeElement.style.opacity = '1';
+    this.bar.nativeElement.style.opacity = this.stickVisibility ? '1' : '1';
   }
 
   public mouseLeave() {
-    this.bar.nativeElement.style.opacity = '0';
+    this.bar.nativeElement.style.opacity = this.stickVisibility ? '1' : '0';
   }
 
   private initBarDrag() {
@@ -137,7 +143,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
       event.dataTransfer.setDragImage(crt, 0, 0);
     };
     bar.ondrag = (event) => {
-      if (typeof position !== "number"){
+      if (typeof position !== 'number'){
         return;
       }
       const actualPosition = [event.clientX, event.clientY];
@@ -151,7 +157,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
           this.newPosition.emit({left, right});
         }
 
-        if (right < 0 && left > 0) {
+        if (left > 0) {
           if (!outsideRightInterval) {
             this.exitRight.emit();
             outsideRightInterval = setInterval(() => this.outsideRight.emit(), this.outsideIntervalTime);
@@ -160,7 +166,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
           clearInterval(outsideRightInterval);
           outsideRightInterval = null;
         }
-        if (left < 0 && right > 0) {
+        if (left < 0) {
           if (!outsideLeftInterval) {
             this.exitLeft.emit();
             outsideLeftInterval = setInterval(() => this.outsideLeft.emit(), this.outsideIntervalTime);

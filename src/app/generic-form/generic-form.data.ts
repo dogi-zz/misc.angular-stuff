@@ -6,10 +6,8 @@ export interface FormModel {
   [key: string]: FormModelValue;
 }
 
-export type FormValidationResultValue = string | {type: 'object', value: FormValidationResult} | {type: 'array', error?: string, value: FormValidationResultValue[]};
-
 export interface FormValidationResult {
-  [key: string]: FormValidationResultValue;
+  [key: string]: string;
 }
 
 // Form Definition
@@ -87,6 +85,7 @@ export const ValidationTexts = {
   required: 'this is required',
   typeError: 'type error',
   optionError: 'option error',
+  NaN: 'this is not a valid number',
   numberMin: 'The value has to be at least ${}',
   numberMax: 'The value has to be at most ${}',
   arrayMin: 'The array has a minimum of ${} elements',

@@ -43,13 +43,13 @@ $subform-border-color: 1px solid #cde3f5;
 
 @mixin hover {
   background: #fafafa;
-  &.hovered_add{
+  &.hovered_add {
     background: rgba(163, 250, 166, 0.3);
     box-shadow: 0 0 10px rgba(163, 250, 166, 0.6);
   }
-  &.hovered_delete{
+  &.hovered_delete {
     background: rgba(255, 0, 0, 0.3);
-    box-shadow: 0 0 10px  rgba(255, 0, 0, 0.6);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
   }
 }
 
@@ -78,13 +78,13 @@ $subform-border-color: 1px solid #cde3f5;
       font-weight: bold;
       cursor: default;
       padding-top: 6px;
-
-      &.error {
-        color: red;
-      }
-
       width: 150px;
     }
+
+    &.error .form-by-def-caption {
+      color: red;
+    }
+
 
     .form-by-def-content {
       flex: 1;
@@ -328,7 +328,7 @@ $subform-border-color: 1px solid #cde3f5;
 
         > .form-by-def-input {
 
-          .form-by-def-input-array-item{
+          .form-by-def-input-array-item {
             display: flex;
 
             &.hovered {

@@ -2,9 +2,9 @@
 
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {ControlDef} from '../generic-form.component';
-import {FormDefArray} from '../generic-form.data';
-import {UiConverters, UiTexts} from '../generic-form.module';
+import {ControlDef, GenericFormComponent} from '../generic-form.component';
+import {FormDefArray, FormValidationResult} from '../generic-form.data';
+import {UiConverters, UiTexts} from '../generic-form.definitions';
 
 const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete'];
 
@@ -13,19 +13,24 @@ const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8',
   template: `
     <div *ngIf="control.element.type === 'text'"
          class="form-by-def-input">
-      <input type="text" [(ngModel)]="valueString" (blur)="onInput()" (keydown)="textKeyDown($event)"/>
+      <input type="text" [(ngModel)]="valueString" (keydown)="textKeyDown($event)"
+             (focus)="enterInputField()" (blur)="blurInputField()"
+             (ngModelChange)="onInput()"  />
     </div>
 
     <div *ngIf="control.element.type === 'number'"
          class="form-by-def-input">
       <input type="text" [(ngModel)]="valueString" (keydown)="numberKeyDown($event)"
-             (blur)="onInput()"/>
+             (focus)="enterInputField()" (blur)="blurInputField()"
+             (ngModelChange)="onInput()"/>
     </div>
 
     <div *ngIf="control.element.type === 'integer'"
          class="form-by-def-input">
       <div class="input-wrapper">
-        <input type="text" [(ngModel)]="valueString" (keydown)="numberKeyDown($event)" (blur)="onInput()"/>
+        <input type="text" [(ngModel)]="valueString" (keydown)="numberKeyDown($event)"
+               (focus)="enterInputField()" (blur)="blurInputField()"
+               (ngModelChange)="onInput()"/>
         <div>
           <button (click)="numberAdd(1)" tabindex="-1">▲</button>
           <button (click)="numberAdd(-1)" tabindex="-1">▼</button>
@@ -45,6 +50,7 @@ const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8',
     <div *ngIf="control.element.type === 'selection'"
          class="form-by-def-input"
          app-input-selection-widget
+         (onFocus)="enterInputField()" (onBlur)="blurInputField()"
          [(value)]="value" (valueChange)="onInput()" [options]="control.element.options">
     </div>
 
@@ -72,6 +78,7 @@ const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8',
              [class.empty]="(childControl.element.type === 'object' || childControl.element.type === 'array') && !(childControl.value$|async)"
 
              [control]="childControl"
+             [validationResult]="validationResult"
              (inputValue)="onInputArray(idx, $event)">
 
         </div>
@@ -89,7 +96,11 @@ const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8',
 
     <div *ngIf="control.element.type === 'object'"
          class="form-by-def-input-object">
-      <div generic-form-form class="form-by-def-form" *ngIf="control.value$|async" [formDef]="control.element.properties" [internModel]="value" [validationResult]="$any(control.error) || $any(control.childError)"
+      <div generic-form-form class="form-by-def-form" *ngIf="control.value$|async"
+           [formDef]="control.element.properties"
+           [path]="control.path"
+           [internModel]="value"
+           [validationResult]="validationResult"
            (internModelChange)="onChildInput($event)"></div>
     </div>
 
@@ -106,13 +117,18 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   public inputValue = new EventEmitter<any>();
 
+  @Input()
+  public validationResult: FormValidationResult;
+
   public value: any;
   public valueString: any;
   private valueSubscription: Subscription;
 
   private isInit = false;
 
-  constructor() {
+  constructor(
+    private genericFormComponent: GenericFormComponent,
+  ) {
   }
 
   public ngOnInit(): void {
@@ -182,6 +198,9 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
       this.onInput();
       return;
     }
+    if (event.code === 'Tab'){
+      this.blurInputField();
+    }
     if (!NUMBER_KEYS.includes(event.key) && !event.ctrlKey) {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -226,5 +245,12 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
     if ($event.code === 'Enter') {
       this.onInput();
     }
+  }
+
+  public enterInputField(){
+    this.genericFormComponent.stopUpdate();
+  }
+  public blurInputField(){
+    this.genericFormComponent.continueUpdate();
   }
 }

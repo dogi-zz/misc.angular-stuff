@@ -1,9 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import * as _ from 'lodash';
 import {BehaviorSubject} from 'rxjs';
 import {ControlDef} from '../generic-form.component';
-import {FormDefElement, FormDefinition, FormModel, FormModelValue, FormValidationResult, FormValidationResultValue} from '../generic-form.data';
-import {getCheckedFormModel} from '../generic-form.functions';
+import {FormDefElement, FormDefinition, FormModel, FormModelValue, FormValidationResult} from '../generic-form.data';
 
 @Component({
   selector: '[generic-form-form]',
@@ -11,13 +9,14 @@ import {getCheckedFormModel} from '../generic-form.functions';
     <ng-container *ngFor="let control of formData">
 
       <div class="form-by-def-control"
+           [class.error]="validationResult[control.path]"
            [class.hovered]="control.hover"
            [class.hovered_add]="control.hover === 'add'"
            [class.hovered_delete]="control.hover === 'delete'"
            *ngIf="control.element">
 
-        <div class="form-by-def-caption" [class.error]="control.error" *ngIf="control.element.caption">
-          {{control.element.caption || control.key}}
+        <div class="form-by-def-caption" [class.error]="validationResult[control.path]" *ngIf="control.element.caption">
+          <div [title]="control.path">{{control.element.caption || control.key}}</div>
           <div class="form-by-def-help" *ngIf="control.element.help"
                [title]="control.element.help">{{control.element.help}}</div>
         </div>
@@ -35,6 +34,7 @@ import {getCheckedFormModel} from '../generic-form.functions';
              [class.empty]="(control.element.type === 'object' || control.element.type === 'array') && !(control.value$|async)"
 
              [control]="control"
+             [validationResult]="validationResult"
              (inputValue)="onInput(control, $event)">
         </div>
       </div>
@@ -42,8 +42,9 @@ import {getCheckedFormModel} from '../generic-form.functions';
       <div generic-form-form class="form-by-def-form form-by-def-form-inline"
            *ngIf="control.elementInline"
            [formDef]="control.elementInline.properties"
+           [path]="control.path"
            [internModel]="(control.value$|async)"
-           [validationResult]="$any(control.error)"
+           [validationResult]="validationResult"
            (internModelChange)="onInput(control, $event)"></div>
 
     </ng-container>
@@ -56,6 +57,9 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
 
   @Input()
   public internModel: FormModel;
+
+  @Input()
+  public path: string = '';
 
   @Input()
   public validationResult: FormValidationResult;
@@ -80,41 +84,12 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
     if (changes.internModel) {
       this.loadInternModel();
     }
-    if (changes.validationResult) {
-      this.applyValidationResult();
-    }
   }
 
   private buildForm() {
-    this.formData = Object.entries(this.formDef || {}).map(([key, elementDef]) => GenericFormFormComponent.getControlDefOfElement(key, elementDef));
-    this.applyValidationResult();
+    this.formData = Object.entries(this.formDef || {}).map(([key, elementDef]) => this.getControlDefOfElement(key, elementDef));
   }
 
-  private applyValidationResult() {
-    this.formData.forEach(fd => this.applyValidationValueResult(fd, this.validationResult?.[fd.key]));
-  }
-
-  private applyValidationValueResult(control: ControlDef, validationResultValue: FormValidationResultValue) {
-    if (control.element?.type === 'array') {
-      if (validationResultValue && typeof validationResultValue === 'object' && validationResultValue.type === 'array') {
-        control.error = validationResultValue.error;
-        for (let i = 0; i < (control.arrayElements || []).length; i++) {
-          const childFd = control.arrayElements[i];
-          this.applyValidationValueResult(childFd, validationResultValue.value[i]);
-        }
-      } else {
-        control.error = validationResultValue;
-      }
-    } else if (control.element?.type === 'object') {
-      if (validationResultValue && typeof validationResultValue === 'object' && validationResultValue.type === 'object') {
-        control.childError = validationResultValue.value;
-      } else {
-        control.error = validationResultValue;
-      }
-    } else {
-      control.error = validationResultValue;
-    }
-  }
 
   private loadInternModel() {
     this.formData.forEach(ctrl => {
@@ -135,7 +110,7 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
         for (let i = 0; i < (value as FormModelValue[]).length; i++) {
           const arrayValue = (value as FormModelValue[])[i];
           const subType = arrayDef.elements;
-          const subFd = GenericFormFormComponent.getControlDefOfElement(`${i}`, subType);
+          const subFd = this.getControlDefOfElement(`${ctrl.key}.${i}`, subType);
           ctrl.arrayElements.push(subFd);
           this.loadInternModelValue(subFd, arrayValue);
         }
@@ -146,17 +121,14 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
 
   public async onInput(control: ControlDef, value: any) {
     this.internModel[control.key] = value;
-    if (control.element.caption === 'Weight 1') {
-      console.info('hier', value, _.cloneDeep(this.internModel));
-    }
-    this.internModel = await getCheckedFormModel(this.formDef, this.internModel, true);
     this.internModelChange.emit(this.internModel);
   }
 
 
-  private static getControlDefOfElement(key: string, elementDef: FormDefElement) {
+  private getControlDefOfElement(key: string, elementDef: FormDefElement) {
     return {
-      key, value: null, value$: new BehaviorSubject<any>(null),
+      key, path: `${this.path}.${key}`,
+      value: null, value$: new BehaviorSubject<any>(null),
       element: elementDef.type !== 'object' || !elementDef.inline ? elementDef : null as any,
       elementInline: elementDef.type === 'object' && elementDef.inline ? elementDef : null as any,
     } as ControlDef;
