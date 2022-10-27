@@ -49,6 +49,7 @@ export const formDef1: FormDefinition = {
   },
   bool_1: {
     caption: 'Boolean 1', type: 'boolean',
+    help: 'boolean with three states',
   },
   bool_2: {
     caption: 'Boolean 2', type: 'boolean', required: true,
@@ -91,6 +92,15 @@ export const formDef1: FormDefinition = {
   },
   array_2: {
     caption: 'Array 2', type: 'array',
+    help: 'Optional array',
+    elements: {
+      type: 'text',
+    },
+  },
+  array_3: {
+    caption: 'Array 3', type: 'array',
+    help: 'Array with min 2 and max 4',
+    required: true,
     elements: {
       type: 'text',
       layout: 'wide',
@@ -104,12 +114,13 @@ export const formDef1: FormDefinition = {
 
 export const model1: any = {
   extraData: 'foo',
+  name_1: 'My Name',
   bool_1: true,
   child_2: {
     posX: -2,
   },
   workState: 'employed',
-  array_2: ['element 1', null],
+  array_3: ['element 1', null],
 };
 
 

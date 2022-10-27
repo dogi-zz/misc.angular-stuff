@@ -1,31 +1,101 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+// tslint:disable:no-any
+
+import {Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild} from '@angular/core';
 import * as _ from 'lodash';
-import {BehaviorSubject, Subscription} from 'rxjs';
-import {FormDefBaseElementCaption, FormDefElement, FormDefinition, FormDefInlineObject, FormModel, FormValidationResult} from './generic-form.data';
-import {GenericFormCheckResult, getCheckedFormModelObservable, getValidationResult} from './generic-form.functions';
-
-export type ControlDef = {
-  key: string,
-  path: string,
-  element?: FormDefElement & FormDefBaseElementCaption,
-  elementInline?: FormDefInlineObject,
-
-  value$: BehaviorSubject<any>,
-  valueIsString?: boolean,
-
-  arrayElements?: (ControlDef & { hover?: 'delete' | 'add' })[],
-  arrayMinMax?: [number, number],
-};
+import {Subscription} from 'rxjs';
+import {ButtonControl, ButtonLayoutPosition, ButtonType, ControlDef, ElementLayout, WidgetControl} from './components/generic-form-component.data';
+import {GenericFormInstance} from './generic-form-instance';
+import {FormDefinition, FormModel, FormValidationResult} from './generic-form.data';
 
 @Component({
   selector: 'generic-form',
   template: `
-    <div class="form-by-def">
-      <div generic-form-form class="form-by-def-form" [formDef]="formDef" [internModel]="internCheckResult.model" [validationResult]="validationResult" (internModelChange)="onInput($event)"></div>
+    <div class="generic-form">
+      <div generic-form-form class="generic-form-form" [formDef]="formDef" [internModel]="actualInternModel" [validationResult]="validationResult"></div>
     </div>
+
+    <ng-template #buttonCreateObject [typedTemplate]="buttonControlTypeTemplate" let-control>
+      <img class="add-button" src="/assets/generic-form/add-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+              (mousedown)="control.action()"/>
+    </ng-template>
+
+    <ng-template #buttonRemoveObject [typedTemplate]="buttonControlTypeTemplate" let-control>
+      <img class="add-button" src="/assets/generic-form/remove-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+           (mousedown)="control.action()"/>
+    </ng-template>
+
+    <ng-template #buttonAddToArray [typedTemplate]="buttonControlTypeTemplate" let-control>
+      <img class="add-button" src="/assets/generic-form/add-to-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+           (mousedown)="control.action()"/>
+    </ng-template>
+
+    <ng-template #buttonRemoveFromArray [typedTemplate]="buttonControlTypeTemplate" let-control>
+      <img class="add-button" src="/assets/generic-form/remove-from-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+           (mousedown)="control.action()"/>
+    </ng-template>
+
+
+    <ng-template #inputSelect [typedTemplate]="widgetControlTypeTemplate" let-control>
+      <div class="generic-form-input"
+           app-input-selection-widget
+           (onFocus)="control.onFocus()" (onBlur)="control.onBlur()" (valueChange)="control.onInput($event)"
+           [value]="control.value"
+           [options]="control.options">
+      </div>
+    </ng-template>
+
+    <ng-template #inputBoolean [typedTemplate]="widgetControlTypeTemplate" let-control>
+      <div class="generic-form-input"
+           app-input-boolean-widget
+           [required]="control.required"
+           [value]="control.value" (valueChange)="control.onInput($event)">
+      </div>
+    </ng-template>
+
+    <ng-template #inputInteger [typedTemplate]="widgetControlTypeTemplate" let-control>
+      <div  class="generic-form-input"
+            app-input-integer-widget
+            [min]="control.min" [max]="control.max"
+            (onFocus)="control.onFocus()" (onBlur)="control.onBlur()" (valueChange)="control.onInput($event)"
+            [value]="control.value"
+      >
+      </div>
+    </ng-template>
+
+    <ng-template #inputNumber [typedTemplate]="widgetControlTypeTemplate" let-control>
+      <div  class="generic-form-input"
+            app-input-number-widget
+            [min]="control.min" [max]="control.max"
+            (onFocus)="control.onFocus()" (onBlur)="control.onBlur()" (valueChange)="control.onInput($event)"
+            [value]="control.value"
+      >
+      </div>
+    </ng-template>
+
+    <ng-template #inputText [typedTemplate]="widgetControlTypeTemplate" let-control>
+      <div  class="generic-form-input"
+            app-input-text-widget
+            (onFocus)="control.onFocus()" (onBlur)="control.onBlur()" (valueChange)="control.onInput($event)"
+            [value]="control.value"
+      >
+      </div>
+    </ng-template>
+
   `,
 })
 export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
+
+  @ViewChild('buttonCreateObject') public buttonCreateObject: TemplateRef<ElementRef>;
+  @ViewChild('buttonRemoveObject') public buttonRemoveObject: TemplateRef<ElementRef>;
+  @ViewChild('buttonAddToArray') public buttonAddToArray: TemplateRef<ElementRef>;
+  @ViewChild('buttonRemoveFromArray') public buttonRemoveFromArray: TemplateRef<ElementRef>;
+
+  @ViewChild('inputSelect') public inputSelect: TemplateRef<ElementRef>;
+  @ViewChild('inputBoolean') public inputBoolean: TemplateRef<ElementRef>;
+  @ViewChild('inputInteger') public inputInteger: TemplateRef<ElementRef>;
+  @ViewChild('inputNumber') public inputNumber: TemplateRef<ElementRef>;
+  @ViewChild('inputText') public inputText: TemplateRef<ElementRef>;
+
 
   @Input()
   public formDef: FormDefinition;
@@ -33,51 +103,116 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   public model: FormModel;
 
+  @Input()
+  public getWidget: (control: ControlDef) => TemplateRef<ElementRef>;
+
+  @Input()
+  public getButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
+
+  @Input()
+  public getElementLayout: (control: ControlDef, isEmpty: boolean) => TemplateRef<ElementLayout>;
+
+  public widgetControlTypeTemplate: { $implicit: WidgetControl };
+  public buttonControlTypeTemplate: { $implicit: ButtonControl };
+
+
   @Output()
   public modelChange = new EventEmitter<any>();
+  public actualInternModel: any;
+  public modelChangeSubject: any;
 
-  public internCheckResult: GenericFormCheckResult;
+  private formInstance: GenericFormInstance;
+
 
   public validationResult: FormValidationResult = {};
-  public hasError = false;
 
+  private isInitialised = false;
   private updateStopped = false;
-  private updateStoppedLoadInternModel = false;
-  private updateCallback: () => void;
 
-  private internModelSubscription: Subscription;
-  private internModelTimeout: any;
+  private outputModelSubscription: Subscription;
+  private errorsSubscription: Subscription;
+
+  public resolveElementLayout: (control: ControlDef, isEmpty: boolean) => ElementLayout;
+  public resolveWidget: (control: ControlDef) => TemplateRef<ElementRef>;
+  public resolveButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
 
   constructor() {
   }
 
   public ngOnInit(): void {
-    this.internCheckResult = {model: _.cloneDeep(this.model), state: null};
-    this.loadInternModel().then();
+    this.isInitialised = true;
+
+    this.resolveElementLayout = (control: ControlDef, isEmpty: boolean) => {
+      const customLayout = this.getElementLayout ? this.getElementLayout(control, isEmpty) : {};
+      return {...this.getDefaultElementLayout(control, isEmpty), ...customLayout};
+    };
+
+    this.resolveWidget = (control: ControlDef) => {
+      if (this.getWidget) {
+        return this.getWidget(control) || this.getDefaultWidget(control);
+      } else {
+        return this.getDefaultWidget(control);
+      }
+    };
+
+    this.resolveButton = (control: ControlDef, type: ButtonType) => {
+      if (this.getButton) {
+        return this.getButton(control, type) || this.getDefaultButton(control, type);
+      } else {
+        return this.getDefaultButton(control, type);
+      }
+    };
+
+    this.loadInternModel();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    if (changes.model) {
-      this.internCheckResult = {model: _.cloneDeep(this.model), state: null};
-      this.loadInternModel().then();
+    if (changes.formDef) {
+      this.formInstance = new GenericFormInstance(this.formDef);
+      this.updateModelSubscription();
     }
+    if (changes.model) {
+      this.loadInternModel();
+    }
+  }
+
+  private updateModelSubscription() {
+    this.outputModelSubscription?.unsubscribe();
+    this.outputModelSubscription = this.formInstance.outputModel.subscribe(model => {
+      if (!this.modelChangeSubject || !_.isEqual(this.modelChangeSubject, model)) {
+        const clone = _.cloneDeep(model);
+        this.modelChange.next(clone);
+        this.modelChangeSubject = clone;
+        if (!this.updateStopped) {
+          this.actualInternModel = clone;
+        }
+      }
+    });
+    this.errorsSubscription?.unsubscribe();
+    this.errorsSubscription = this.formInstance.errors.subscribe(errors => {
+      this.validationResult = errors;
+    });
   }
 
   public ngOnDestroy() {
-    this.internModelSubscription?.unsubscribe();
-    clearTimeout(this.internModelTimeout);
+    // this.internModelSubscription?.unsubscribe();
+    // clearTimeout(this.internModelTimeout);
   }
 
-  public async onInput(internModel: any) {
-    if (this.updateStopped) {
-      this.validate();
-      this.updateCallback = () => {
-        this.onInput(internModel).then();
-      };
-      return;
-    }
-    this.internCheckResult.model = internModel;
-    await this.loadInternModel();
+  public setValue(path: string, value: any) {
+    this.formInstance.setValue(path, value);
+  }
+
+  public addToArray(path: string, value: any) {
+    this.formInstance.addToArray(path, value);
+  }
+
+  public deleteFromArray(path: string, idx: number) {
+    this.formInstance.deleteFromArray(path, idx);
+  }
+
+  public wasCorrected(path: string, value: any) {
+    return this.formInstance.wasCorrected(path, value);
   }
 
   public stopUpdate() {
@@ -86,40 +221,86 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
 
   public continueUpdate() {
     this.updateStopped = false;
-    if (this.updateStoppedLoadInternModel) {
-      this.updateStoppedLoadInternModel = false;
-      this.loadInternModel().then();
-    } else if (this.updateCallback) {
-      this.updateCallback();
-    }
-    this.updateCallback = null;
+    this.actualInternModel = this.modelChangeSubject;
   }
 
 
-  private async loadInternModel() {
-    if (this.updateStopped) {
-      this.updateStoppedLoadInternModel = true;
+  private loadInternModel() {
+    if (!this.isInitialised) {
       return;
     }
-    this.internModelSubscription?.unsubscribe();
-    clearTimeout(this.internModelTimeout);
-    this.internModelTimeout = setTimeout(async () => {
-      this.internModelSubscription = await getCheckedFormModelObservable(this.formDef, this.internCheckResult.model, this.internCheckResult.state).subscribe(checkResult => {
-        clearTimeout(this.internModelTimeout);
-        this.internModelTimeout = setTimeout(() => {
-          this.modelChange.emit(checkResult.model);
-          this.internCheckResult = checkResult;
-          this.validate();
-        });
-      });
-    });
+    const workingModel = _.cloneDeep(this.model);
+    this.formInstance.setModel(workingModel);
   }
 
-  private validate() {
-    this.validationResult = getValidationResult('', this.formDef, this.internCheckResult.model, this.internCheckResult.state);
-    this.hasError = Object.keys(this.validationResult).length > 0;
+  private getDefaultWidget(control: ControlDef): TemplateRef<ElementRef> {
+    if (control.element.type === 'selection') {
+      return this.inputSelect;
+    }
+    if (control.element.type === 'boolean') {
+      return this.inputBoolean;
+    }
+    if (control.element.type === 'integer') {
+      return this.inputInteger;
+    }
+    if (control.element.type === 'number') {
+      return this.inputNumber;
+    }
+    if (control.element.type === 'text') {
+      return this.inputText;
+    }
+    return null;
   }
 
+  private getDefaultButton(control: ControlDef, type: ButtonType): {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition} {
+    if (type === 'CreateObject') {
+      return {position: 'BeforeInput', template: this.buttonCreateObject};
+    }
+    if (type === 'RemoveObject') {
+      return {position: 'InsidePanel', template: this.buttonRemoveObject};
+    }
+    if (type === 'CreateArray') {
+      return {position: 'BeforeInput', template: this.buttonCreateObject};
+    }
+    if (type === 'RemoveArray') {
+      return {position: 'InsidePanel', template: this.buttonRemoveObject};
+    }
+    if (type === 'AddToArray') {
+      return {position:  null, template: this.buttonAddToArray};
+    }
+    if (type === 'RemoveFromArray') {
+      return {position: null, template: this.buttonRemoveFromArray};
+    }
+    return null;
+  }
+
+  private getDefaultElementLayout(control: ControlDef, isEmpty: boolean): ElementLayout {
+    if (control.element.type === 'object' && !isEmpty) {
+      return {
+        title: 'InsidePanel',
+        help: 'InsidePanel',
+        error: 'InsidePanel',
+        arrayError: 'InsidePanel',
+        removeButtonPosition: null,
+      };
+    }
+    if (control.element.type === 'array' && !isEmpty) {
+      return {
+        title: 'InsidePanel',
+        help: 'InsidePanel',
+        error: 'InsidePanel',
+        arrayError: 'InsidePanel',
+        removeButtonPosition: null,
+      };
+    }
+    return {
+      title: 'BeforeControl',
+      help: 'BeforeControl',
+      error: 'BeforeControl',
+      arrayError: 'AfterInput',
+      removeButtonPosition: null,
+    };
+  }
 
 }
 

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnChanges, OnInit} from '@angular/core';
 
 @Component({
   selector: 'bar-and-panel-showcase',
@@ -10,13 +10,15 @@ export class BarAndPanelShowcaseComponent implements OnInit {
   public left = 20;
   public textOutside: string;
 
+  public stickyPanelVisible = true;
+
   constructor() {
   }
 
   public ngOnInit(): void {
   }
 
-  public onDragRight(newPosition: {left: number, right: number}) {
+  public onDragRight(newPosition: { left: number, right: number }) {
     const newWidth = newPosition.left - this.left;
     if (newWidth > 10 && (newWidth + this.left) < 490) {
       this.width = newWidth;
@@ -24,7 +26,7 @@ export class BarAndPanelShowcaseComponent implements OnInit {
     this.textOutside = null;
   }
 
-  public onDragLeft(newPosition: {left: number, right: number}) {
+  public onDragLeft(newPosition: { left: number, right: number }) {
     const newLeft = newPosition.left;
     if (newLeft > 10 && (newLeft + this.width) < 490) {
       this.left = newLeft;
@@ -56,4 +58,14 @@ export class BarAndPanelShowcaseComponent implements OnInit {
   public onMoveEnd() {
     this.textOutside = null;
   }
+
+  public hideSticky($event: MouseEvent) {
+    $event.stopImmediatePropagation();
+    this.stickyPanelVisible = false;
+  }
+
+  public showSticky($event: MouseEvent) {
+    this.stickyPanelVisible = true;
+  }
+
 }

@@ -1,108 +1,111 @@
 // tslint:disable:no-any
 
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {ControlDef, GenericFormComponent} from '../generic-form.component';
-import {FormDefArray, FormValidationResult} from '../generic-form.data';
-import {UiConverters, UiTexts} from '../generic-form.definitions';
-
-const NUMBER_KEYS = ['.', ',', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'Backspace', 'Delete'];
+import {GenericFormComponent} from '../generic-form.component';
+import {FormDefArray, FormDefElementCaption, FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormValidationResult} from '../generic-form.data';
+import {UiTexts} from '../generic-form.definitions';
+import {ButtonControl, ButtonLayoutPosition, ControlDef, WidgetControl} from './generic-form-component.data';
 
 @Component({
   selector: '[generic-form-input]',
   template: `
-    <div *ngIf="control.element.type === 'text'"
-         class="form-by-def-input">
-      <input type="text" [(ngModel)]="valueString" (keydown)="textKeyDown($event)"
-             (focus)="enterInputField()" (blur)="blurInputField()"
-             (ngModelChange)="onInput()"  />
-    </div>
+    <app-generic-form-caption remove-wrapper
+                              [isArrayElement]="isArrayElement"
+                              cssClass="generic-form-caption-before-input" [layoutPosition]="'BeforeInput'"
+                              [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
 
-    <div *ngIf="control.element.type === 'number'"
-         class="form-by-def-input">
-      <input type="text" [(ngModel)]="valueString" (keydown)="numberKeyDown($event)"
-             (focus)="enterInputField()" (blur)="blurInputField()"
-             (ngModelChange)="onInput()"/>
-    </div>
+    <!--  *ngIf="control.element.type === 'text'" -->
+    <!--  *ngIf="control.element.type === 'number'" -->
+    <!--  *ngIf="control.element.type === 'integer'" -->
+    <!--  *ngIf="control.element.type === 'boolean'" -->
+    <!--  *ngIf="control.element.type === 'selection'" -->
+    <ng-container *ngIf="widgetTemplate">
+      <ng-container
+        *ngTemplateOutlet="widgetTemplate; context:{$implicit: widgetControl}"></ng-container>
+    </ng-container>
 
-    <div *ngIf="control.element.type === 'integer'"
-         class="form-by-def-input">
-      <div class="input-wrapper">
-        <input type="text" [(ngModel)]="valueString" (keydown)="numberKeyDown($event)"
-               (focus)="enterInputField()" (blur)="blurInputField()"
-               (ngModelChange)="onInput()"/>
-        <div>
-          <button (click)="numberAdd(1)" tabindex="-1">▲</button>
-          <button (click)="numberAdd(-1)" tabindex="-1">▼</button>
-        </div>
+    <div *ngIf="control.element.type === 'object'"
+         class="generic-form-input-object">
+
+      <app-generic-form-caption remove-wrapper
+                                cssClass="generic-form-caption-inside-panel" [layoutPosition]="'InsidePanel'"
+                                [withButton]="!control.element.required && (control.value$|async)"
+                                [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
+
+      <app-generic-form-button remove-wrapper
+                               cssClass="generic-form-button-inside-panel" [layoutPosition]="'InsidePanel'"
+                               [control]="control" [isEmpty]="control.valueIsEmpty"></app-generic-form-button>
+
+      <div class="generic-form-form" *ngIf="!(control.value$|async)">
+        <!--        <app-generic-form-button remove-wrapper-->
+        <!--                                 cssClass="generic-form-button-inside-panel" [layoutPosition]="'InsidePanel'"-->
+        <!--                                 [control]="control" [isEmpty]="control.valueIsEmpty"></app-generic-form-button>-->
       </div>
-    </div>
 
-    <div *ngIf="control.element.type === 'boolean'"
-         class="form-by-def-input">
-      <div [class.isTrue]="(control.value$|async)===true"
-           [class.isFalse]="(control.value$|async)===false"
-           (click)="booleanClick()">
-        <div></div>
-      </div>
-    </div>
-
-    <div *ngIf="control.element.type === 'selection'"
-         class="form-by-def-input"
-         app-input-selection-widget
-         (onFocus)="enterInputField()" (onBlur)="blurInputField()"
-         [(value)]="value" (valueChange)="onInput()" [options]="control.element.options">
+      <div generic-form-form class="generic-form-form" *ngIf="control.value$|async"
+           [formDef]="control.element.properties"
+           [path]="control.path"
+           [internModel]="value"
+           [validationResult]="validationResult"></div>
     </div>
 
 
     <div *ngIf="control.element.type === 'array'"
-         class="form-by-def-input">
+         class="generic-form-input">
 
-      <div class="form-by-def-input-array-item"
-           *ngFor="let childControl of control.arrayElements; let idx = index;"
+
+      <app-generic-form-caption remove-wrapper
+                                cssClass="generic-form-caption-inside-panel" [layoutPosition]="'InsidePanel'"
+                                [withButton]="!control.element.required && (control.value$|async)"
+                                [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
+
+      <app-generic-form-button remove-wrapper
+                               cssClass="generic-form-button-inside-panel" [layoutPosition]="'InsidePanel'"
+                               [control]="control" [isEmpty]="control.valueIsEmpty"></app-generic-form-button>
+
+      <div class="generic-form-input-array-item"
+           *ngFor="let childControl of control.arrayElements; let idx = index;  trackBy:trackArrayElement"
+           [attr.array-index]="idx"
            [class.hovered]="childControl.hover"
-           [class.hovered_add]="childControl.hover === 'add'"
            [class.hovered_delete]="childControl.hover === 'delete'"
       >
-        <div class="form-by-def-content"
+        <div class="generic-form-content"
              generic-form-control
+             [isArrayElement]="true"
 
-             [class.form-by-def-input-text]="childControl.element.type === 'text'"
-             [class.form-by-def-input-number]="childControl.element.type === 'number'"
-             [class.form-by-def-input-integer]="childControl.element.type === 'integer'"
-             [class.form-by-def-input-boolean]="childControl.element.type === 'boolean'"
-             [class.form-by-def-input-selection]="childControl.element.type === 'selection'"
-             [class.form-by-def-input-object]="childControl.element.type === 'object'"
-             [class.form-by-def-input-array]="childControl.element.type === 'array'"
+             [class.generic-form-input-text]="childControl.element.type === 'text'"
+             [class.generic-form-input-number]="childControl.element.type === 'number'"
+             [class.generic-form-input-integer]="childControl.element.type === 'integer'"
+             [class.generic-form-input-boolean]="childControl.element.type === 'boolean'"
+             [class.generic-form-input-selection]="childControl.element.type === 'selection'"
+             [class.generic-form-input-object]="childControl.element.type === 'object'"
+             [class.generic-form-input-array]="childControl.element.type === 'array'"
              [class.wide]="childControl.element.type === 'text' && childControl.element.layout === 'wide'"
-             [class.empty]="(childControl.element.type === 'object' || childControl.element.type === 'array') && !(childControl.value$|async)"
+             [class.empty]="childControl.valueIsEmpty"
 
              [control]="childControl"
-             [validationResult]="validationResult"
-             (inputValue)="onInputArray(idx, $event)">
+             [validationResult]="validationResult">
 
         </div>
-        <button class="form-by-def-input-array-delete-button"
-                (mouseenter)="childControl.hover = 'delete'" (mouseleave)="childControl.hover = null"
-                (click)="removeArrayElement(idx)">{{deleteFromArrayText}}</button>
+        <div  class="generic-form-input-array-remove-button">
+          <ng-container
+            *ngTemplateOutlet="removeFromArrayButtonTemplate; context:{$implicit: control.removeFromArrayButtonControls[idx]}"></ng-container>
+        </div>
       </div>
 
-      <button *ngIf="value && (!control.arrayMinMax || control.arrayMinMax[0] < 0 || control.arrayElements.length < control.arrayMinMax[0])"
-              class="form-by-def-input-array-add-button"
-              (mouseenter)="control.hover = 'add'" (mouseleave)="control.hover = null"
-              (click)="addArrayElement()">{{addToArrayText}}</button>
+      <div *ngIf="value && (!control.arrayMinMax || control.arrayMinMax[1] < 0 || control.arrayElements.length < control.arrayMinMax[1])"
+           class="generic-form-input-array-add-button">
+        <ng-container
+          *ngTemplateOutlet="addToArrayButtonTemplate; context:{$implicit: control.addToArrayButtonControl}"></ng-container>
+      </div>
 
     </div>
 
-    <div *ngIf="control.element.type === 'object'"
-         class="form-by-def-input-object">
-      <div generic-form-form class="form-by-def-form" *ngIf="control.value$|async"
-           [formDef]="control.element.properties"
-           [path]="control.path"
-           [internModel]="value"
-           [validationResult]="validationResult"
-           (internModelChange)="onChildInput($event)"></div>
-    </div>
+    <app-generic-form-caption remove-wrapper
+                              [isArrayElement]="isArrayElement"
+                              cssClass="generic-form-caption-after-input" [layoutPosition]="'AfterInput'"
+                              [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
 
   `,
 })
@@ -112,19 +115,27 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
   public deleteFromArrayText = UiTexts.removeFromArray;
 
   @Input()
-  public control: ControlDef & { hover?: 'delete' | 'add' };
-
-  @Output()
-  public inputValue = new EventEmitter<any>();
+  public control: ControlDef;
 
   @Input()
   public validationResult: FormValidationResult;
 
+  @Input()
+  public isArrayElement: boolean;
+
+
   public value: any;
-  public valueString: any;
   private valueSubscription: Subscription;
 
   private isInit = false;
+
+  public widgetTemplate: TemplateRef<ElementRef>;
+
+  public widgetControl: WidgetControl;
+
+  public addToArrayButtonTemplate: TemplateRef<ElementRef>;
+  public removeFromArrayButtonTemplate: TemplateRef<ElementRef>;
+
 
   constructor(
     private genericFormComponent: GenericFormComponent,
@@ -132,12 +143,33 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.isInit = true;
-    this.update().then();
+    this.widgetControl = {
+      value: null,
+      onFocus: () => {
+        this.enterInputField();
+      },
+      onBlur: () => {
+        this.blurInputField();
+      },
+      onInput: (value: any) => {
+        this.value = value;
+        this.onInput();
+      },
+    };
+
+    setTimeout(() => {
+      this.isInit = true;
+      this.update().then();
+    });
+
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    this.update().then();
+    if (this.isInit) {
+      if (changes.control) {
+        this.update().then();
+      }
+    }
   }
 
   public ngOnDestroy() {
@@ -150,107 +182,54 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
     }
     this.valueSubscription?.unsubscribe();
 
-    const uiConverter = UiConverters[this.control.element.type];
+    this.widgetTemplate = this.genericFormComponent.resolveWidget(this.control);
+    this.widgetControl.options = (this.control.element as FormDefElementSelect).options;
+    this.widgetControl.required = (this.control.element as FormDefElementCaption).required;
+    this.widgetControl.min = (this.control.element as FormDefElementNumber | FormDefElementInteger).min;
+    this.widgetControl.max = (this.control.element as FormDefElementNumber | FormDefElementInteger).max;
+
     this.valueSubscription = this.control.value$.subscribe(value => {
       this.value = value;
-      if (uiConverter) {
-        this.valueString = uiConverter.toString(this.value);
-      }
+      this.widgetControl.value = value;
     });
 
+    const wasCorrected = this.genericFormComponent.wasCorrected(this.control.path, this.value);
+    if (wasCorrected) {
+      this.genericFormComponent.setValue(this.control.path, this.value);
+    }
+
+    setTimeout(()=>{
+      if (this.control.element.type === 'array'){
+        let buttonData : {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
+        buttonData = this.genericFormComponent.resolveButton(this.control, 'AddToArray');
+        this.addToArrayButtonTemplate = buttonData.template;
+        buttonData = this.genericFormComponent.resolveButton(this.control, 'RemoveFromArray');
+        this.removeFromArrayButtonTemplate = buttonData.template;
+      } else {
+        this.addToArrayButtonTemplate = null;
+        this.removeFromArrayButtonTemplate = null;
+      }
+
+    });
   }
 
   public onInput() {
-    const uiConverter = UiConverters[this.control.element.type];
-    const value: any = uiConverter ? uiConverter.fromString(this.valueString) : this.value;
-    this.inputValue.emit(value);
-  }
-
-  public onChildInput(value: any) {
-    this.inputValue.emit(value);
-  }
-
-  public onInputArray(idx: number, value: any) {
-    //console.info(this.control)
-    //this.control.arrayElements[idx].value$.next(value);
-    this.control.value$.value[idx] = value;
-    this.inputValue.emit(this.control.value$.value);
-  }
-
-  // Number
-
-  public numberAdd(amount: number) {
-    this.value = this.value || 0;
-    this.value += amount;
-    if (this.control.element.type === 'integer' && this.control.element.min && this.value < this.control.element.min) {
-      this.value = this.control.element.min;
-    }
-    if (this.control.element.type === 'integer' && this.control.element.max && this.value > this.control.element.max) {
-      this.value = this.control.element.max;
-    }
-    const uiConverter = UiConverters[this.control.element.type];
-    this.valueString = uiConverter.toString(this.value);
-    this.onInput();
-  }
-
-  public numberKeyDown(event: KeyboardEvent) {
-    if (event.code === 'Enter'){
-      this.onInput();
-      return;
-    }
-    if (event.code === 'Tab'){
-      this.blurInputField();
-    }
-    if (!NUMBER_KEYS.includes(event.key) && !event.ctrlKey) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    }
-  }
-
-  // Boolean
-
-  public booleanClick() {
-    if (this.control.element.type === 'boolean') {
-      if (this.value === true) {
-        this.value = false;
-      } else if (this.value === false && !this.control.element.required) {
-        this.value = null;
-      } else {
-        this.value = true;
-      }
-    }
-    this.onInput();
+    this.genericFormComponent.setValue(this.control.path, this.value);
   }
 
   // Array
 
-  public addArrayElement() {
-    const arrayDef = this.control.element as FormDefArray;
-    if (arrayDef.elements.type === 'array') {
-      this.value.push([]);
-    } else if (arrayDef.elements.type === 'object') {
-      this.value.push(arrayDef.elements.required ? {} : null);
-    } else {
-      this.value.push(null);
-    }
-    this.onInput();
-  }
 
-  public removeArrayElement(idx: number) {
-    this.value.splice(idx, 1);
-    this.onInput();
-  }
 
-  public textKeyDown($event: KeyboardEvent) {
-    if ($event.code === 'Enter') {
-      this.onInput();
-    }
-  }
-
-  public enterInputField(){
+  public enterInputField() {
     this.genericFormComponent.stopUpdate();
   }
-  public blurInputField(){
+
+  public blurInputField() {
     this.genericFormComponent.continueUpdate();
+  }
+
+  public trackArrayElement(index, element: ControlDef) {
+    return JSON.stringify([element.element, element.value$.value, element.path, element.key]);
   }
 }

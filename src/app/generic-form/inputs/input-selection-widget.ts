@@ -23,17 +23,17 @@ const checkSearchString = (search: string, option: string) => {
              (blur)="onSelectionLeave()"
              (keydown)="onKeyDown($event)"/>
       <div>
-        <button (mousedown)="onSelectionButton()" tabindex="-1">▼</button>
+        <button (mousedown)="onSelectionButton()" tabindex="-1"></button>
       </div>
     </div>
-    <div *ngIf="filteredOptions" class="form-by-def-input-select-options" #selectionWindow>
+    <div *ngIf="filteredOptions" class="generic-form-input-select-options" #selectionWindow>
       <div *ngFor="let option of filteredOptions; let idx = index"
-           class="form-by-def-input-select-option"
+           class="generic-form-input-select-option"
            [class.selected]="option.value === value"
            [class.hovered]="cursorIndex === idx"
            (mousedown)="selectOption(option)">{{option.label}}</div>
       <div *ngIf="!filteredOptions?.length"
-           class="form-by-def-input-select-option no-option">no options
+           class="generic-form-input-select-option no-option">no options
       </div>
 
     </div>
@@ -48,13 +48,11 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
   @ViewChild('selectionInput')
   public selectionInput: ElementRef<HTMLElement>;
 
-  @Input() public value!: any;
+  @Input() public value: any;
   @Output() public valueChange = new EventEmitter<any>();
 
   @Output() public onFocus = new EventEmitter<void>();
   @Output() public onBlur = new EventEmitter<void>();
-
-
 
   @Input() public options: FormDefElementSelectOption[] | Promise<FormDefElementSelectOption[]> | Observable<FormDefElementSelectOption[]>;
 
@@ -175,10 +173,13 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
       const optionsRect = this.selectionWindow.nativeElement.getBoundingClientRect();
       const inputRect = this.selectionInput.nativeElement.getBoundingClientRect();
 
+      this.selectionWindow.nativeElement.parentElement.style.position = 'relative';
+      this.selectionWindow.nativeElement.style.position = 'absolute';
+
       if (inputRect.bottom + optionsRect.height > window.innerHeight) {
         this.selectionWindow.nativeElement.style.top = `-${optionsRect.height}px`;
       } else {
-        this.selectionWindow.nativeElement.style.top = `100%`;
+        this.selectionWindow.nativeElement.style.top = `calc( 100% - 1px )`;
       }
 
       const rect = this.selectionWindow.nativeElement.getBoundingClientRect();
@@ -209,7 +210,6 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
       this.cursorIndex = this.cursorIndex - 1;
     }
     if ($event.key === 'Enter') {
-      console.info('HIER', this.cursorIndex);
       if (this.filteredOptions?.length && this.filteredOptions[this.cursorIndex]) {
         this.filteredOptions = this.filteredOptions.slice(this.cursorIndex, this.cursorIndex + 1);
         this.selectionInput.nativeElement.blur();

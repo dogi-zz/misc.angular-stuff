@@ -5,8 +5,8 @@ import {AppComponent} from '../app.component';
 import {FormDefinition} from '../generic-form/generic-form.data';
 import {formDef1, model1} from './generic-form-definitions-1';
 import {formDef2, model2} from './generic-form-definitions-2';
-import {formDef3, formDef3Options, model3} from './generic-form-definitions-3';
-import {formDef4, model4} from './generic-form-definitions-4';
+import {formDef3, model3} from './generic-form-definitions-3';
+import {formDef4, formDef4Options, model4} from './generic-form-definitions-4';
 
 const formDefinitions: { [formKey: string]: { form: FormDefinition, model: any } } = {
   form1: {form: formDef1, model: model1},
@@ -77,12 +77,12 @@ export class GenericFormShowcaseComponent implements OnInit {
     this.model_result = this.model;
     this.model_string = JSON.stringify(this.model_result, null, 2);
 
-    if (formKey === 'form3') {
+    if (formKey === 'form4') {
       Object.entries(this.formDef).forEach(([key, value]) => {
         if (value.type === 'selection') {
           if (value.options as any === '{observable}') {
             this.selectOptionsObservable = new BehaviorSubject([]);
-            this.selectOptionsJson = JSON.stringify(formDef3Options);
+            this.selectOptionsJson = JSON.stringify(formDef4Options);
             value.options = this.selectOptionsObservable;
           }
         }

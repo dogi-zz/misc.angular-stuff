@@ -67,6 +67,23 @@ export const formDef2: FormDefinition = {
     },
   },
 
+  subform1: {
+    type: 'subform',
+    inline: true,
+    content: {
+      s1_name: {
+        caption: 'Subform Name', type: 'text',
+      },
+      s1_age: {
+        caption: 'Subform Age', type: 'integer',
+        min: 18,
+        max: 99,
+        help: '18 <= age <= 99',
+      },
+
+    },
+  },
+
 };
 
 

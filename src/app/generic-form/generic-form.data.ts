@@ -12,71 +12,83 @@ export interface FormValidationResult {
 
 // Form Definition
 
-export type FormDefinition = { [name: string]: (FormDefElement & FormDefBaseElementCaption) | FormDefInlineObject };
+export type FormDefinition = { [name: string]: FormDefElementCaption | FormDefInline };
 
 export type FormDefElement =
-  FormDefElementText | FormDefElementNumber | FormDefElementInteger | FormDefElementSelect | FormDefElementBoolean
-  | FormDefObject | FormDefInlineObject | FormDefArray;
+  FormDefElementText | FormDefElementNumber | FormDefElementInteger | FormDefElementSelect | FormDefElementBoolean  | FormDefArray |
+  FormDefObject | FormDefSubform;
+
+export type FormDefElementCaption = FormDefElement & FormDefBaseElementCaption;
+
+export type FormDefInline =  (FormDefObject | FormDefSubform) & FormDefBaseInlineElement;
+
+
+
 
 // Element Types
 
-export type FormDefBaseElement = {
-  required?: boolean;
-};
-
 export type FormDefBaseElementCaption = {
+  required?: boolean;
   caption: string;
   help?: string;
+  inline?: false;
 };
 
-export type FormDefElementText = FormDefBaseElement & {
+export type FormDefBaseInlineElement  = {
+  inline: true;
+};
+
+export type FormDefElementText =  {
   type: 'text',
   layout?: 'wide' | 'default',
 };
 
-export type FormDefElementNumber = FormDefBaseElement & {
+export type FormDefElementNumber =  {
   type: 'number',
   min?: number,
   max?: number,
 };
 
-export type FormDefElementInteger = FormDefBaseElement & {
+export type FormDefElementInteger =  {
   type: 'integer',
   min?: number,
   max?: number,
 };
 
-export type FormDefElementBoolean = FormDefBaseElement & {
+export type FormDefElementBoolean =  {
   type: 'boolean',
 };
 
 export type FormDefElementSelectOption = { label: string, value: FormModelValue };
-export type FormDefElementSelect = FormDefBaseElement & {
+export type FormDefElementSelect =  {
   type: 'selection',
   options: FormDefElementSelectOption[] | Promise<FormDefElementSelectOption[]> | Observable<FormDefElementSelectOption[]>,
 };
 
 
-export type FormDefObject = FormDefBaseElement & {
-  type: 'object',
-  inline?:false;
-  properties: FormDefinition,
-};
-
-export type FormDefInlineObject = FormDefBaseElement & {
-  type: 'object',
-  inline:true;
-  properties: FormDefinition,
-};
-
-
-export type FormDefArray = FormDefBaseElement & {
+export type FormDefArray =  {
   type: 'array',
 
-  elements: FormDefElement,
+  elements: FormDefElement & {required?: boolean},
   minLength?: number;
   maxLength?: number;
 };
+
+
+
+export type FormDefObject =  {
+  type: 'object',
+  properties: FormDefinition,
+};
+
+export type FormDefSubform =   {
+  type: 'subform',
+  content: FormDefinition,
+  options?: FormDefElementSelectOption[] | Promise<FormDefElementSelectOption[]> | Observable<FormDefElementSelectOption[]>,
+};
+
+
+
 
 
 // Constants

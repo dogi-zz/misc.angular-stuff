@@ -1,6 +1,8 @@
 import {FormModelValue} from './generic-form.data';
 
-export const UiConverters: { [type: string]: { toString?: (value: FormModelValue) => string, fromString: (str: string) => FormModelValue } } = {
+export type UiConverter = { toString?: (value: FormModelValue) => string, fromString: (str: string) => FormModelValue };
+
+export const UiConverters: { [type: string]: UiConverter } = {
   'text': {
     fromString: (value) => {
       return value?.length ? value : null;
@@ -39,7 +41,6 @@ export const UiConverters: { [type: string]: { toString?: (value: FormModelValue
 };
 export const UiTexts = {
   objectSetToNull: 'remove object',
-  objectCreate: 'create object',
   arraySetToNull: 'remove array',
   arrayCreate: 'create array',
   addToArray: '+',
