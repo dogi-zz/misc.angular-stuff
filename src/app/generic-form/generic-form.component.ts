@@ -15,22 +15,22 @@ import {FormDefinition, FormModel, FormValidationResult} from './generic-form.da
     </div>
 
     <ng-template #buttonCreateObject [typedTemplate]="buttonControlTypeTemplate" let-control>
-      <img class="add-button" src="/assets/generic-form/add-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+      <img class="add-button" src="./assets/generic-form/add-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
               (mousedown)="control.action()"/>
     </ng-template>
 
     <ng-template #buttonRemoveObject [typedTemplate]="buttonControlTypeTemplate" let-control>
-      <img class="add-button" src="/assets/generic-form/remove-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+      <img class="add-button" src="./assets/generic-form/remove-button.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
     <ng-template #buttonAddToArray [typedTemplate]="buttonControlTypeTemplate" let-control>
-      <img class="add-button" src="/assets/generic-form/add-to-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+      <img class="add-button" src="./assets/generic-form/add-to-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
     <ng-template #buttonRemoveFromArray [typedTemplate]="buttonControlTypeTemplate" let-control>
-      <img class="add-button" src="/assets/generic-form/remove-from-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
+      <img class="add-button" src="./assets/generic-form/remove-from-array.svg" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
