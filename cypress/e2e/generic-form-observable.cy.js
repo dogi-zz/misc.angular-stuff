@@ -15,12 +15,12 @@ describe('generic-form-observable', () => {
     });
 
     cy.get('.generic-form-control:contains("Age 1")').then(withinSubject => {
-      cy.get('.input-wrapper button:eq(0)', {withinSubject}).click();
+      cy.getSettled('.input-wrapper button:eq(0)', {withinSubject}).click();
       cy.get('pre.model-result').should('contain', '"some_number": 1');
       cy.get('pre.model-result').should('contain', '"select_options": null');
     });
 
-    cy.get('button:contains("update")').click();
+    cy.getSettled('button:contains("update")').click();
     cy.get('.generic-form-control:contains("SelectOptions")').then(withinSubject => {
       cy.get('pre.model-result').should('contain', '"select_options": "foo"');
       cy.get('.generic-form-error:contains("option error")', {withinSubject}).should('not.exist');

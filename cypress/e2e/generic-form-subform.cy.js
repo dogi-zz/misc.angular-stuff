@@ -13,7 +13,7 @@ describe('generic-form-subform', () => {
     cy.get(`${selector} .generic-form-add-button`).should('exist');
     cy.get('pre.model-result').should('contain', '"child_1": null,');
 
-    cy.get(`${selector} .generic-form-add-button img:visible`).click();
+    cy.getSettled(`${selector} .generic-form-add-button img:visible`).click();
 
     cy.get('pre.model-result').should('contain', [
       '"child_1": {',
@@ -24,10 +24,10 @@ describe('generic-form-subform', () => {
 
     const childSelector = '.generic-form-control:contains("Pos X")';
 
-    cy.get(`${selector} ${childSelector} input`).type('-1').blur();
+    cy.getSettled(`${selector} ${childSelector} input`).type('-1').blur();
     cy.get(`${selector} ${childSelector}`).should('have.class', 'error');
 
-    cy.get(`${selector} ${childSelector} input`).type('{backspace}{backspace}5').blur();
+    cy.getSettled(`${selector} ${childSelector} input`).type('{backspace}{backspace}5').blur();
     cy.get(`${selector} ${childSelector}`).should('not.have.class', 'error');
 
     cy.get('pre.model-result').should('contain', [
@@ -37,7 +37,7 @@ describe('generic-form-subform', () => {
       '}',
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-remove-button img:visible`).click();
+    cy.getSettled(`${selector} .generic-form-remove-button img:visible`).click();
     cy.get('pre.model-result').should('contain', '"child_1": null,');
 
   });
@@ -69,10 +69,10 @@ describe('generic-form-subform', () => {
       '}',
     ].join('\n  '));
 
-    cy.get(`${selector} input`).type('-1').blur();
+    cy.getSettled(`${selector} input`).type('-1').blur();
     cy.get(`${selector}`).should('have.class', 'error');
 
-    cy.get(`${selector} input`).type('{backspace}{backspace}5').blur();
+    cy.getSettled(`${selector} input`).type('{backspace}{backspace}5').blur();
     cy.get(`${selector}`).should('not.have.class', 'error');
 
     cy.get('pre.model-result').should('contain', [
@@ -93,16 +93,16 @@ describe('generic-form-subform', () => {
     cy.get('pre.model-result').should('contain', '"s1_name": null');
     cy.get('pre.model-result').should('contain', '"s1_age": null');
 
-    cy.get(`${selector2} input`).type('-1').blur();
+    cy.getSettled(`${selector2} input`).type('-1').blur();
     cy.get(`${selector2}`).should('have.class', 'error');
 
-    cy.get(`${selector2} input`).type('{backspace}{backspace}57').blur();
+    cy.getSettled(`${selector2} input`).type('{backspace}{backspace}57').blur();
     cy.get(`${selector2}`).should('not.have.class', 'error');
 
     cy.get('pre.model-result').should('contain', '"s1_name": null');
     cy.get('pre.model-result').should('contain', '"s1_age": 57');
 
-    cy.get(`${selector1} input`).type('Max Mustermann').blur();
+    cy.getSettled(`${selector1} input`).type('Max Mustermann').blur();
     cy.get(`${selector1}`).should('not.have.class', 'error');
     cy.get(`${selector2}`).should('not.have.class', 'error');
 

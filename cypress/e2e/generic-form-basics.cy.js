@@ -11,7 +11,7 @@ describe('generic-form-basics', () => {
     cy.get(selector).should('exist');
 
     cy.get('pre.model-result').should('contain', '"name_1": "My Name"');
-    cy.get(`${selector} input`).clear().type('Test Value 1').blur();
+    cy.getSettled(`${selector} input`).clear().type('Test Value 1').blur();
     cy.get('pre.model-result').should('contain', '"name_1": "Test Value 1",');
   });
 
@@ -23,7 +23,7 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');
     cy.get('pre.model-result').should('contain', '"name_2": null');
 
-    cy.get(`${selector} input`,).type('Test Value 2');
+    cy.getSettled(`${selector} input`,).type('Test Value 2');
     cy.get(selector).should('not.have.class', 'error');
 
     cy.get(`${selector} input`).blur();
@@ -38,12 +38,12 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');
     cy.get('pre.model-result').should('contain', '"gender": null');
 
-    cy.get(`${selector} input`).click();
-    cy.get(`${selector} .generic-form-input-select-option:contains("female")`).click();
+    cy.getSettled(`${selector} input`).click();
+    cy.getSettled(`${selector} .generic-form-input-select-option:contains("female")`).click();
     cy.get('pre.model-result').should('contain', '"gender": 2');
 
-    cy.get(`${selector} input`).click();
-    cy.get(`${selector} .generic-form-input-select-option:contains("unknown")`).click();
+    cy.getSettled(`${selector} input`).click();
+    cy.getSettled(`${selector} .generic-form-input-select-option:contains("unknown")`).click();
     cy.get('pre.model-result').should('contain', '"gender": false');
   });
 
@@ -55,10 +55,10 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');
     cy.get('pre.model-result').should('contain', '"gender": null');
 
-    cy.get(`${selector} input`).click();
+    cy.getSettled(`${selector} input`).click();
     cy.get(`${selector} .generic-form-input-select-option`).should('be.visible');
 
-    cy.get(`${selector} .input-wrapper button`).click();
+    cy.getSettled(`${selector} .input-wrapper button`).click();
     cy.get(`${selector} .generic-form-input-select-option`).should('not.exist');
 
     cy.get(`${selector}`).should('have.class', 'error');
@@ -73,19 +73,19 @@ describe('generic-form-basics', () => {
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get('pre.model-result').should('contain', '"age": null');
 
-    cy.get(`${selector} input`).type('3');
+    cy.getSettled(`${selector} input`).type('3');
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'The value has to be at least 18');
 
-    cy.get(`${selector} input`).type('0');
+    cy.getSettled(`${selector} input`).type('0');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
-    cy.get(`${selector} input`).type('0');
+    cy.getSettled(`${selector} input`).type('0');
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'The value has to be at most 99');
 
-    cy.get(`${selector} input`).type('{backspace}');
+    cy.getSettled(`${selector} input`).type('{backspace}');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
@@ -96,29 +96,29 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"age": 30');
 
-    cy.get(`${selector} .input-wrapper button:eq(0)`).click();
-    cy.get(`${selector} .input-wrapper button:eq(0)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(0)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(0)`).click();
 
     cy.get('pre.model-result').should('contain', '"age": 32');
 
-    cy.get(`${selector} .input-wrapper button:eq(1)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(1)`).click();
 
-    cy.get(`${selector} input`).type('{backspace}{backspace}17').blur();
+    cy.getSettled(`${selector} input`).type('{backspace}{backspace}17').blur();
 
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'The value has to be at least 18');
     cy.get('pre.model-result').should('contain', '"age": 17');
 
-    cy.get(`${selector} .input-wrapper button:eq(0)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(0)`).click();
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"age": 18');
 
-    cy.get(`${selector} .input-wrapper button:eq(0)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(0)`).click();
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"age": 19');
 
-    cy.get(`${selector} .input-wrapper button:eq(1)`).click();
-    cy.get(`${selector} .input-wrapper button:eq(1)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(1)`).click();
+    cy.getSettled(`${selector} .input-wrapper button:eq(1)`).click();
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"age": 18');
 
@@ -131,29 +131,29 @@ describe('generic-form-basics', () => {
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get('pre.model-result').should('contain', '"weight_1": null');
 
-    cy.get(`${selector} input`).type('79');
+    cy.getSettled(`${selector} input`).type('79');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
     cy.get(`${selector} input`).blur();
     cy.get('pre.model-result').should('contain', '"weight_1": 79');
 
-    cy.get(`${selector} input`).type('0');
+    cy.getSettled(`${selector} input`).type('0');
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'The value has to be at most 100');
 
-    cy.get(`${selector} input`).type('{backspace}');
+    cy.getSettled(`${selector} input`).type('{backspace}');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
-    cy.get(`${selector} input`).type('.1');
+    cy.getSettled(`${selector} input`).type('.1');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
     cy.get(`${selector} input`).blur();
     cy.get('pre.model-result').should('contain', '"weight_1": 79.1');
 
-    cy.get(`${selector} input`).type('{backspace}{backspace}{backspace}{backspace}-1');
+    cy.getSettled(`${selector} input`).type('{backspace}{backspace}{backspace}{backspace}-1');
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'The value has to be at least 0');
 
@@ -173,7 +173,7 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');
     cy.get('pre.model-result').should('contain', '"weight_2": null');
 
-    cy.get(`${selector} input`).type('57');
+    cy.getSettled(`${selector} input`).type('57');
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
 
@@ -189,17 +189,17 @@ describe('generic-form-basics', () => {
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get('pre.model-result').should('contain', '"bool_1": true');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_1": false');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_1": null');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_1": true');
@@ -216,17 +216,17 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');
     cy.get('pre.model-result').should('contain', '"bool_2": null');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_2": true');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_2": false');
 
-    cy.get(`${selector} .generic-form-input .input-switch`).click();
+    cy.getSettled(`${selector} .generic-form-input .input-switch`).click();
     cy.get(`${selector}`).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('not.exist');
     cy.get('pre.model-result').should('contain', '"bool_2": true');

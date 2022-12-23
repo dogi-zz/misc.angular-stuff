@@ -35,3 +35,46 @@
 //     }
 //   }
 // }
+// tslint:disable-next-line:no-namespace
+import Chainable = Cypress.Chainable;
+
+declare namespace Cypress {
+
+  interface Chainable {
+
+    getSettled(selector: string, attacheTime?: number, tries?: number): Chainable<Element>;
+
+  }
+}
+
+
+Cypress.Commands.add('getSettled', (selector: string, attacheTime: number, tries: number) => {
+  const start = new Date().getTime();
+  // tslint:disable-next-line:no-parameter-reassignment
+  attacheTime = attacheTime || 200;
+  // tslint:disable-next-line:no-parameter-reassignment
+  tries = tries || 40;
+  // tslint:disable-next-line:no-any
+  return new Cypress.Promise<any>((resolve, reject) => {
+    const trySettle = (tryCount) => {
+      const el = Cypress.$(selector);
+      setTimeout(() => {
+        if (Cypress.dom.isAttached(el) && el.length === 1) {
+          resolve(el);
+        } else if (tryCount > tries) {
+          if (el.length > 1) {
+            resolve(`Element settled but too many ${selector} was ${el.length}`);
+          } else if (el.length) {
+            resolve(`Element not settled ${selector}`);
+          } else {
+            resolve(`Element not found ${selector}`);
+          }
+        } else {
+          trySettle(tryCount + 1);
+        }
+      }, attacheTime);
+    };
+    trySettle(1);
+    // tslint:disable-next-line:no-any
+  }) as any;
+});

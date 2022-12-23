@@ -26,10 +26,10 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
   public bar: ElementRef<HTMLElement>;
 
   @Input()
-  public positionLeft: number ;
+  public positionLeft: number;
 
   @Input()
-  public positionRight: number ;
+  public positionRight: number;
 
   @Input()
   public outsideIntervalTime: number = 200;
@@ -39,7 +39,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
 
 
   @Output()
-  public newPosition = new EventEmitter<{left: number, right: number}>();
+  public newPosition = new EventEmitter<{ left: number, right: number }>();
 
   @Output()
   public outsideRight = new EventEmitter<void>();
@@ -72,14 +72,14 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
     if (changes.container) {
       this.initContainer();
     }
-    if (changes.positionLeft || changes.positionRight    ) {
+    if (changes.positionLeft || changes.positionRight) {
       this.checkPosition();
     }
   }
 
   private initContainer() {
     if (this.container && this.bar?.nativeElement) {
-      if (!['relative', 'absolute', 'fixed'].includes(this.container.style.position) ){
+      if (!['relative', 'absolute', 'fixed'].includes(this.container.style.position)) {
         this.container.style.position = 'relative';
       }
 
@@ -143,7 +143,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
       event.dataTransfer.setDragImage(crt, 0, 0);
     };
     bar.ondrag = (event) => {
-      if (typeof position !== 'number'){
+      if (typeof position !== 'number') {
         return;
       }
       const actualPosition = [event.clientX, event.clientY];

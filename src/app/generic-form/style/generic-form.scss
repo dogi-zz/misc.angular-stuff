@@ -182,12 +182,6 @@ $color-error-border: #e79292;
 
   }
 
-  .generic-form-button.generic-form-button-inside-panel{
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-
   /** General Layout **/
 
   .generic-form-control {
@@ -428,6 +422,13 @@ $color-error-border: #e79292;
           &:not(.empty) {
             @include inner-panel;
             position: relative;
+
+            > .generic-form-button.generic-form-button-inside-panel {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+            }
+
           }
         }
       }
@@ -458,6 +459,13 @@ $color-error-border: #e79292;
 
         > .generic-form-input {
           position: relative;
+
+          > .generic-form-button.generic-form-button-inside-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
+
         }
       }
     }
@@ -509,7 +517,7 @@ $color-error-border: #e79292;
               opacity: 0.5;
             }
 
-            > .generic-form-content{
+            > .generic-form-content {
               margin-right: 10px;
             }
 
@@ -520,14 +528,30 @@ $color-error-border: #e79292;
               > .generic-form-input-div {
                 position: relative;
                 flex: 1;
+
+                >.generic-form-input{
+                  > .generic-form-button.generic-form-button-inside-panel {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                  }
+                }
               }
             }
 
             > .generic-form-content.generic-form-input-object:not(.empty) {
               @include inner-panel;
-              > .generic-form-input-div{
-                > .generic-form-input-object{
+
+              > .generic-form-input-div {
+                > .generic-form-input-object {
                   position: relative;
+
+                  > .generic-form-button.generic-form-button-inside-panel {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                  }
+
                 }
               }
             }

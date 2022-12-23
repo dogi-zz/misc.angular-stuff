@@ -18,7 +18,7 @@ describe('generic-form-basic-arrays', () => {
       '"array_1": []',
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 1);
     cy.get('pre.model-result').should('contain', [
@@ -27,7 +27,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 2);
     cy.get('pre.model-result').should('contain', [
@@ -37,7 +37,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} input:eq(1)`).type('foo bar').blur();
+    cy.getSettled(`${selector} input:eq(1)`).type('foo bar').blur();
 
     cy.get('pre.model-result').should('contain', [
       '"array_1": [',
@@ -46,7 +46,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-item:eq(0) .generic-form-input-array-remove-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-item:eq(0) .generic-form-input-array-remove-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 1);
     cy.get('pre.model-result').should('contain', [
@@ -70,14 +70,14 @@ describe('generic-form-basic-arrays', () => {
       '"array_2": null',
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-add-button img:visible`).click();
+    cy.getSettled(`${selector} .generic-form-add-button img:visible`).click();
 
     cy.get(`${selector} input`).should('have.length', 0);
     cy.get('pre.model-result').should('contain', [
       '"array_2": []'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 1);
     cy.get('pre.model-result').should('contain', [
@@ -86,7 +86,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 2);
     cy.get('pre.model-result').should('contain', [
@@ -96,7 +96,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} input:eq(0)`).type('foo bar').blur();
+    cy.getSettled(`${selector} input:eq(0)`).type('foo bar').blur();
 
     cy.get('pre.model-result').should('contain', [
       '"array_2": [',
@@ -105,7 +105,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-remove-button img:visible`).click();
+    cy.getSettled(`${selector} .generic-form-remove-button img:visible`).click();
 
     cy.get(`${selector} input`).should('not.exist');
     cy.get('pre.model-result').should('contain', [
@@ -133,7 +133,7 @@ describe('generic-form-basic-arrays', () => {
     cy.get(`${selector} .generic-form-input-array-item:eq(0) .generic-form-error`).should('not.exist');
     cy.get(`${selector} .generic-form-input-array-item:eq(1) .generic-form-error`).should('exist');
 
-    cy.get(`${selector} input:eq(0)`).type('2').blur();
+    cy.getSettled(`${selector} input:eq(0)`).type('2').blur();
 
     cy.get(`${selector} input`).should('have.length', 2);
     cy.get('pre.model-result').should('contain', [
@@ -143,7 +143,7 @@ describe('generic-form-basic-arrays', () => {
       ']'
     ].join('\n  '));
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(selector).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-caption:visible:first .generic-form-error`).should('not.exist');
@@ -151,7 +151,7 @@ describe('generic-form-basic-arrays', () => {
     cy.get(`${selector} .generic-form-input-array-item:eq(1) .generic-form-error`).should('exist');
     cy.get(`${selector} .generic-form-input-array-item:eq(2) .generic-form-error`).should('exist');
 
-    cy.get(`${selector} input:eq(1)`).type('test')
+    cy.getSettled(`${selector} input:eq(1)`).type('test')
 
     cy.get(selector).should('not.have.class', 'error');
     cy.get(`${selector} .generic-form-caption:visible:first .generic-form-error`).should('not.exist');
@@ -159,7 +159,7 @@ describe('generic-form-basic-arrays', () => {
     cy.get(`${selector} .generic-form-input-array-item:eq(1) .generic-form-error`).should('not.exist');
     cy.get(`${selector} .generic-form-input-array-item:eq(2) .generic-form-error`).should('exist');
 
-    cy.get(`${selector} .generic-form-input-array-item:eq(0) .generic-form-input-array-remove-button img`).click();
+    cy.getSettled(`${selector} .generic-form-input-array-item:eq(0) .generic-form-input-array-remove-button img`).click();
 
     cy.get(selector).should('have.class', 'error');
     cy.get(`${selector} .generic-form-caption:visible:first .generic-form-error`).should('exist');

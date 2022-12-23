@@ -1,7 +1,13 @@
-<button class="angular-stuff" (click)="showGenericForm()">Generic Form</button>
-<button class="angular-stuff" (click)="showSplitBar()">Split Bar</button>
 
-<hr/>
+<div class="angular-stuff-menu">
+  <div class="btn" (click)="showGenericForm()">
+    <span>Generic Form</span>
+  </div>
+  <div class="btn" (click)="showSplitBar()">
+    <span>Split Bar / Info Panel</span>
+  </div>
+</div>
+
 
 <generic-form-showcase *ngIf="showPage === 'form'"></generic-form-showcase>
 
