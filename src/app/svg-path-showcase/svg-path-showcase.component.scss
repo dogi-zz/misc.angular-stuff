@@ -1,0 +1,60 @@
+
+.showcaseTile {
+  width: 440px;
+  &.wide{
+    width: 490px;
+  }
+}
+
+.imageWrapper {
+  margin: 10px 20px;
+
+  .imageWrapperContent {
+    margin: 20px 0;
+
+    .main {
+      display: flex;
+
+      .vSlider {
+        margin: 0 5px;
+      }
+
+      .image {
+        display: block;
+        height: 200px;
+        width: 400px;
+        border: 1px solid gray;
+
+        > svg {
+          border: 1px gray;
+        }
+      }
+    }
+
+    .hSliders {
+      display: flex;
+      margin: 5px 0 10px;
+
+      .hSlider {
+        width: 190px;
+      }
+
+      &.withV {
+        .hSlider {
+          width: 190px;
+          margin-left: 20px;
+        }
+
+      }
+    }
+
+
+  }
+
+  .description {
+    margin-top: 5px;
+    font-size: 10px;
+    font-family: monospace;
+  }
+
+}

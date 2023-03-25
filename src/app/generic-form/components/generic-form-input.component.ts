@@ -3,7 +3,7 @@
 import {Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {GenericFormComponent} from '../generic-form.component';
-import {FormDefArray, FormDefElementCaption, FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormValidationResult} from '../generic-form.data';
+import {FormDefArray, FormDefElementNotInline, FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormValidationResult, FormDefBaseElementRequired} from '../generic-form.data';
 import {UiTexts} from '../generic-form.definitions';
 import {ButtonControl, ButtonLayoutPosition, ControlDef, WidgetControl} from './generic-form-component.data';
 
@@ -184,7 +184,7 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
 
     this.widgetTemplate = this.genericFormComponent.resolveWidget(this.control);
     this.widgetControl.options = (this.control.element as FormDefElementSelect).options;
-    this.widgetControl.required = (this.control.element as FormDefElementCaption).required;
+    this.widgetControl.required = (this.control.element as FormDefBaseElementRequired).required;
     this.widgetControl.min = (this.control.element as FormDefElementNumber | FormDefElementInteger).min;
     this.widgetControl.max = (this.control.element as FormDefElementNumber | FormDefElementInteger).max;
 

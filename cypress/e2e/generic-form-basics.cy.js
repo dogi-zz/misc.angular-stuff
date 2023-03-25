@@ -59,7 +59,7 @@ describe('generic-form-basics', () => {
     cy.get(`${selector} .generic-form-input-select-option`).should('be.visible');
 
     cy.getSettled(`${selector} .input-wrapper button`).click();
-    cy.get(`${selector} .generic-form-input-select-option`).should('not.exist');
+    cy.get(`${selector} .generic-form-input-select-option`).should('not.be.visible');
 
     cy.get(`${selector}`).should('have.class', 'error');
     cy.get(`${selector} .generic-form-error`).should('contain', 'this is required');

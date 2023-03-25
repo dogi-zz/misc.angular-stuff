@@ -4,6 +4,10 @@ $button-color: #135ea7;
 $border-color: #559de3;
 $background-color: rgba(111, 173, 232, 0.1);
 
+$button-yellow-color: #a78413;
+$border-yellow-color: #e3bb55;
+$background-yellow-color: rgba(232, 198, 111, 0.1);
+
 body {
   background: #eff3f8;
 }
@@ -30,17 +34,42 @@ h1, h2{
   margin-top: 20px;
 
   .btn {
-    margin: 0 20px;
-    line-height: 50px;
-    height: 50px;
+    &.b1{
+      margin: 0 20px;
+      line-height: 50px;
+      height: 50px;
+      width: 250px;
+    }
+    &.b2{
+      margin: 0 10px;
+      line-height: 25px;
+      height: 25px;
+      width: 120px;
+    }
+    &.bWide{
+      margin: 0;
+      line-height: 50px;
+      height: 50px;
+      width: 100%;
+    }
     text-align: center;
-    width: 250px;
     cursor: pointer;
 
     color: $button-color;
     transition: all 0.3s;
     position: relative;
   }
+  .btn.yellow {
+    color: $button-yellow-color;
+  }
+  //.btn.active::before{
+  //  border-top-width: 1px;
+  //  border-bottom-width: 1px;
+  //  border-top-style: solid;
+  //  border-bottom-style: solid;
+  //  border-top-color: $border-color;
+  //  border-bottom-color: $border-color;
+  //}
   .btn span {
     transition: all 0.3s;
   }
@@ -62,14 +91,18 @@ h1, h2{
     border-bottom-color: $border-color;
     transform: scale(0.1, 1);
   }
-  .btn:hover span {
+  .btn.yellow::before{
+    border-top-color: $border-yellow-color;
+    border-bottom-color: $border-yellow-color;
+  }
+  .btn:not(.active):hover span {
     letter-spacing: 2px;
   }
-  .btn:hover::before {
+  .btn:not(.active):hover::before, .btn.active::before {
     opacity: 1;
     transform: scale(1, 1);
   }
-  .btn::after {
+  .btn:not(.active)::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -80,7 +113,10 @@ h1, h2{
     transition: all 0.3s;
     background-color: $background-color;
   }
-  .btn:hover::after {
+  .btn.yellow:not(.active)::after {
+    background-color: $background-yellow-color;
+  }
+  .btn:not(.active):hover::after {
     opacity: 0;
     transform: scale(0.1, 1);
   }
@@ -88,6 +124,12 @@ h1, h2{
 }
 
 
+pre.codeblock{
+  border: 1px solid;
+  border-color: $border-color;
+  background: $background-color;
+  margin-top: 0;
+}
 
 
 img.add-button{

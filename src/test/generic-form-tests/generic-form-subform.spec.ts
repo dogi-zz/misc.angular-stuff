@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it} from '@jest/globals';
-import {GenericFormInstance} from '../generic-form/generic-form-instance';
-import {FormDefElementSelectOption, FormDefinition, ValidationTexts} from '../generic-form/generic-form.data';
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject} from 'rxjs';
+import {GenericFormInstance} from '../../app/generic-form/generic-form-instance';
+import {FormDefElementSelectOption, FormDefinition, ValidationTexts} from '../../app/generic-form/generic-form.data';
 
 
 describe('generic-form-subform', () => {
@@ -19,7 +19,6 @@ describe('generic-form-subform', () => {
       formInstance.setModel(model);
       return formInstance.outputModel.value;
     };
-
 
     formDefinition = {
       name: {caption: null, type: 'text'},

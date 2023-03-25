@@ -1,7 +1,7 @@
-import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {BehaviorSubject, combineLatest, Observable, Subscription} from 'rxjs';
 import {FormDefElementSelectOption} from '../generic-form.data';
-import {optionDefinitionToObservable, optionDefinitionToPromise} from '../generic-form.functions';
+import {GenFormSubject} from '../generic-form.functions';
 
 const checkSearchString = (search: string, option: string) => {
   const searchWords = search.toLowerCase().trim().split(' ').map(w => w.trim()).filter(w => w.length);
@@ -11,6 +11,37 @@ const checkSearchString = (search: string, option: string) => {
   } else {
     return true;
   }
+};
+
+
+const optionDefinitionToPromise = <T>(value: T | Promise<T> | Observable<T>) => {
+  if (value instanceof Promise) {
+    return value;
+  }
+  if (value instanceof Observable) {
+    return new Promise<T>(res => {
+      const subscription = value.subscribe(val => {
+        res(val);
+        setTimeout(() => subscription?.unsubscribe());
+      });
+    });
+  }
+  return Promise.resolve(value);
+};
+
+
+const optionDefinitionToObservable = <T>(value: T | Promise<T> | Observable<T>) => {
+  if (value instanceof Promise) {
+    const replaySubject = new GenFormSubject<T>();
+    value.then(v => replaySubject.next(v));
+    return replaySubject;
+  }
+  if (value instanceof Observable) {
+    return value;
+  }
+  const result = new GenFormSubject<T>();
+  setTimeout(() => result.next(value));
+  return result;
 };
 
 @Component({
@@ -26,7 +57,7 @@ const checkSearchString = (search: string, option: string) => {
         <button (mousedown)="onSelectionButton()" tabindex="-1"></button>
       </div>
     </div>
-    <div *ngIf="filteredOptions" class="generic-form-input-select-options" #selectionWindow>
+    <div  class="generic-form-input-select-options" #selectionWindow>
       <div *ngFor="let option of filteredOptions; let idx = index"
            class="generic-form-input-select-option"
            [class.selected]="option.value === value"
@@ -39,7 +70,7 @@ const checkSearchString = (search: string, option: string) => {
     </div>
   `,
 })
-export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
+export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy, AfterViewInit {
 
 
   @ViewChild('selectionWindow')
@@ -76,6 +107,12 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
     this.update().then();
   }
 
+  public ngAfterViewInit() {
+    this.selectionWindow.nativeElement.parentElement.style.position = 'relative';
+    this.selectionWindow.nativeElement.style.position = 'absolute';
+    this.selectionWindow.nativeElement.style.display = 'none';
+  }
+
   public ngOnChanges(changes: SimpleChanges) {
     if (changes.options) {
       this.update().then();
@@ -83,6 +120,7 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
       this.value$.next(this.value);
     }
   }
+
 
   public ngOnDestroy() {
     this.selectionSearchInputSubscription?.unsubscribe();
@@ -128,6 +166,7 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
     this.selectionOptions = await optionDefinitionToPromise(this.options);
     this.filteredOptions = [...this.selectionOptions];
     await new Promise(res => setTimeout(res));
+    this.selectionWindow.nativeElement.style.display = '';
     this.checkSelectionWindow();
   }
 
@@ -155,7 +194,7 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
         this.onBlur.emit();
       });
     } else {
-      this.selectionSearchInput = this.filteredOptions[0].label || '';
+      this.selectionSearchInput = this.filteredOptions[0]?.label || '';
       this.value$.next(this.value);
       this.onBlur.emit();
     }
@@ -165,6 +204,7 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
   public closeSelection() {
     this.selectionOptions = null;
     this.filteredOptions = null;
+    this.selectionWindow.nativeElement.style.display = 'none';
   }
 
 
@@ -172,9 +212,6 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
     if (this.selectionOptions) {
       const optionsRect = this.selectionWindow.nativeElement.getBoundingClientRect();
       const inputRect = this.selectionInput.nativeElement.getBoundingClientRect();
-
-      this.selectionWindow.nativeElement.parentElement.style.position = 'relative';
-      this.selectionWindow.nativeElement.style.position = 'absolute';
 
       if (inputRect.bottom + optionsRect.height > window.innerHeight) {
         this.selectionWindow.nativeElement.style.top = `-${optionsRect.height}px`;
@@ -186,7 +223,6 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
       if (rect.bottom < 0 || rect.top > window.innerHeight) {
         this.closeSelection();
       }
-
     }
   }
 
@@ -202,7 +238,6 @@ export class InputSelectionWidget implements OnInit, OnChanges, OnDestroy {
   }
 
   public onKeyDown($event: KeyboardEvent) {
-    console.info($event);
     if ($event.key === 'ArrowDown') {
       this.cursorIndex = Math.min(this.filteredOptions.length - 1, this.cursorIndex + 1);
     }

@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it} from '@jest/globals';
 import {BehaviorSubject} from 'rxjs';
-import {GenericFormInstance} from '../generic-form/generic-form-instance';
-import {FormDefElementSelectOption, FormDefinition, ValidationTexts} from '../generic-form/generic-form.data';
+import {GenericFormInstance} from '../../app/generic-form/generic-form-instance';
+import {FormDefElementSelectOption, FormDefinition, ValidationTexts} from '../../app/generic-form/generic-form.data';
 
 
 describe('generic-form', () => {
@@ -64,6 +64,7 @@ describe('generic-form', () => {
     };
     formInstance = new GenericFormInstance(formDefinition);
 
+
     expect(getValidationResult({})).toEqual({
       '.name_2': ValidationTexts.required,
       '.age_2': ValidationTexts.required,
@@ -119,6 +120,7 @@ describe('generic-form', () => {
     });
 
   });
+
 
 
   it('Set Value on Primitive Data', async () => {

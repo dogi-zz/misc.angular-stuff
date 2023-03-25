@@ -10,7 +10,7 @@ export class AppComponent implements OnInit {
 
   public title = 'misc.angular-stuff';
 
-  public showPage: 'form' | 'split_bar';
+  public showPage: 'form' | 'split_bar' | 'svg_tools';
 
   constructor() {
   }
@@ -23,6 +23,9 @@ export class AppComponent implements OnInit {
     if (params.page === 'split_bar') {
       this.showPage = 'split_bar';
     }
+    if (params.page === 'svg_tools') {
+      this.showPage = 'svg_tools';
+    }
   }
 
 
@@ -33,6 +36,11 @@ export class AppComponent implements OnInit {
 
   public showSplitBar() {
     this.setParams({page: 'split_bar'});
+    this.ngOnInit();
+  }
+
+  public showSvgTools() {
+    this.setParams({page: 'svg_tools'});
     this.ngOnInit();
   }
 

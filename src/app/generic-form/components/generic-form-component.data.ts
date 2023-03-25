@@ -1,7 +1,7 @@
 // tslint:disable:no-any
 
 import {BehaviorSubject, Observable} from 'rxjs';
-import {FormDefElementCaption, FormDefElementSelectOption, FormDefinition, FormDefInline} from '../generic-form.data';
+import {FormDefElementNotInline, FormDefElementSelectOption, FormDefinition, FormDefElementInline} from '../generic-form.data';
 
 export type ButtonType = 'CreateObject' | 'RemoveObject' | 'CreateArray' | 'RemoveArray' | 'AddToArray' | 'RemoveFromArray';
 
@@ -9,8 +9,8 @@ export type ControlDef = {
   key: string,
   path: string,
   calculatedCaption?: string,
-  element?: FormDefElementCaption,
-  elementInline?: FormDefInline,
+  element?: FormDefElementNotInline,
+  elementInline?: FormDefElementInline,
   elementInlineProperties: FormDefinition
 
   hover?: 'delete' | 'add';

@@ -14,11 +14,9 @@ describe('generic-form-observable', () => {
       cy.get('.generic-form-error:contains("option error")', {withinSubject}).should('be.visible');
     });
 
-    cy.get('.generic-form-control:contains("Age 1")').then(withinSubject => {
-      cy.getSettled('.input-wrapper button:eq(0)', {withinSubject}).click();
-      cy.get('pre.model-result').should('contain', '"some_number": 1');
-      cy.get('pre.model-result').should('contain', '"select_options": null');
-    });
+    cy.getSettled('.generic-form-control:contains("Age 1") .input-wrapper button:eq(0)').click();
+    cy.get('pre.model-result').should('contain', '"some_number": 1');
+    cy.get('pre.model-result').should('contain', '"select_options": null');
 
     cy.getSettled('button:contains("update")').click();
     cy.get('.generic-form-control:contains("SelectOptions")').then(withinSubject => {
@@ -28,5 +26,27 @@ describe('generic-form-observable', () => {
     cy.get('.generic-form-control:contains("SelectOptions")').should('not.have.class', 'error');
 
  });
+
+  it('Object - Async Validation', () => {
+
+    cy.get('.generic-form-caption:contains("Position")').should('have.class', 'error');
+
+    cy.get('pre.model-result').should('contain', '"posX": 1');
+    cy.get('pre.model-result').should('contain', '"posY": 1');
+
+    cy.getSettled('.generic-form-control:contains("PosX") .input-wrapper button:eq(0)').click();
+    cy.get('pre.model-result').should('contain', '"posX": 2');
+
+    cy.get('.generic-form-caption:contains("Position")').should('not.have.class', 'error');
+
+    cy.getSettled('.generic-form-control:contains("PosX") .input-wrapper button:eq(1)').click();
+    cy.get('pre.model-result').should('contain', '"posX": 1');
+
+    cy.get('.generic-form-caption:contains("Position")').should('not.have.class', 'error');
+    cy.wait(1000)
+    cy.get('.generic-form-caption:contains("Position")').should('have.class', 'error');
+
+  });
+
 
 });

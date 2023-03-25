@@ -36,19 +36,20 @@ export class GenericFormShowcaseComponent implements OnInit {
   public formDef = formDef1;
   public model = _.cloneDeep(model1);
 
-  private formKey = 'form1';
+  public formKey = 'form1';
 
   public width = 250;
   public model_result: any = null;
   public model_input_string: string = 'null';
   public model_string: string = 'null';
 
+  public canEdit = false;
   public editMode = false;
   public formDefJson: string;
   public modelJson: string;
   public editError: string;
 
-  public selectOptionsObservable: BehaviorSubject<{ label: string, value: any }[]>;
+  public asyncFormOptionsObservable: BehaviorSubject<{ label: string, value: any }[]>;
   public selectOptionsJson: string;
 
   constructor(
@@ -77,13 +78,18 @@ export class GenericFormShowcaseComponent implements OnInit {
     this.model_result = this.model;
     this.model_string = JSON.stringify(this.model_result, null, 2);
 
+    this.canEdit = true;
+    this.editError = null;
+    this.editMode = false;
+
     if (formKey === 'form4') {
+      this.canEdit = false;
       Object.entries(this.formDef).forEach(([key, value]) => {
         if (value.type === 'selection') {
           if (value.options as any === '{observable}') {
-            this.selectOptionsObservable = new BehaviorSubject([]);
+            this.asyncFormOptionsObservable = new BehaviorSubject([]);
             this.selectOptionsJson = JSON.stringify(formDef4Options);
-            value.options = this.selectOptionsObservable;
+            value.options = this.asyncFormOptionsObservable;
           }
         }
       });
@@ -120,7 +126,12 @@ export class GenericFormShowcaseComponent implements OnInit {
     }
   }
 
+  public cancelEdit() {
+    this.editError = null;
+    this.editMode = false;
+  }
+
   public form3UpdateSelection(){
-    this.selectOptionsObservable.next(JSON.parse(this.selectOptionsJson));
+    this.asyncFormOptionsObservable.next(JSON.parse(this.selectOptionsJson));
   }
 }
