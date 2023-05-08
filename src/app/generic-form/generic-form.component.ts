@@ -121,7 +121,10 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   public actualInternModel: any;
   public modelChangeSubject: any;
 
-  private formInstance: GenericFormInstance;
+  @Output()
+  public validChange = new EventEmitter<boolean>();
+
+  public formInstance: GenericFormInstance;
 
 
   public validationResult: FormValidationResult = {};
@@ -191,6 +194,7 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
     this.errorsSubscription?.unsubscribe();
     this.errorsSubscription = this.formInstance.errors.subscribe(errors => {
       this.validationResult = errors;
+      setTimeout(()=>this.validChange.next(!Object.keys(errors).length));
     });
   }
 
@@ -211,9 +215,9 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
     this.formInstance.deleteFromArray(path, idx);
   }
 
-  public wasCorrected(path: string, value: any) {
-    return this.formInstance.wasCorrected(path, value);
-  }
+  // public wasCorrected(path: string, value: any) {
+  //   return this.formInstance.wasCorrected(path, value);
+  // }
 
   public stopUpdate() {
     this.updateStopped = true;

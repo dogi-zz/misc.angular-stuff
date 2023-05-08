@@ -179,7 +179,7 @@ describe('generic-form-subform', () => {
     formInstance.setModel({});
 
     expect(formInstance.outputModel.value).toEqual({name: null, position: {posX: null, posY: null}});
-    expect(formInstance.errors.value['.position']).toEqual(ValidationTexts.required);
+    expect(formInstance.errors.value['.position']).toEqual(undefined);
 
     formInstance.setValue('.position', {});
     expect(formInstance.outputModel.value).toEqual({name: null, position: {posX: null, posY: null}});
@@ -239,9 +239,7 @@ describe('generic-form-subform', () => {
     expect(getOutputValue({array1: 'foo'})).toEqual({array1: []});
     expect(getOutputValue({array1: null})).toEqual({array1: []});
 
-    expect(getValidationResult({})).toEqual({
-      '.array1': ValidationTexts.required,
-    });
+    expect(getValidationResult({})).toEqual({});
     expect(getValidationResult({array1: true})).toEqual({
       '.array1': ValidationTexts.typeError,
     });

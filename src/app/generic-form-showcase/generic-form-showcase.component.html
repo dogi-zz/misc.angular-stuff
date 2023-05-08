@@ -6,6 +6,7 @@
     <div class="btn b2" [class.active]="formKey==='form2'" (click)="changeForm('form2')"><span>Objects</span></div>
     <div class="btn b2" [class.active]="formKey==='form3'" (click)="changeForm('form3')"><span>Arrays</span></div>
     <div class="btn b2" [class.active]="formKey==='form4'" (click)="changeForm('form4')"><span>Async</span></div>
+    <div class="btn b2" [class.active]="formKey==='form5'" (click)="changeForm('form5')"><span>Conditions</span></div>
   </div>
 </div>
 
@@ -16,18 +17,22 @@
 
     <div style="flex: 1;">
       <generic-form *ngIf="!editMode" [formDef]="formDef" [model]="model"
-                    (modelChange)="modelChange($event)"></generic-form>
+                    (modelChange)="modelChange($event)"  (validChange)="validChange($event)"></generic-form>
       <textarea *ngIf="editMode" [(ngModel)]="formDefJson"
                 style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
     </div>
 
     <div [ngStyle]="{width: width + 'px'}">
-    <pre class="model-result codeblock" *ngIf="!editMode"
-         style="margin-left: 10px; overflow: scroll; width: calc( 100% - 10px ); height: 100px">{{model_input_string}}</pre>
-      <pre class="model-result  codeblock" *ngIf="!editMode"
-           style="margin-left: 10px; overflow: scroll; width: calc( 100% - 10px ); height: calc( 100% - 135px )">{{model_string}}</pre>
-      <textarea *ngIf="editMode" [(ngModel)]="modelJson"
-                style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
+      <div style="margin-left: 10px; ">
+        <div class="form-description">Input:</div>
+        <pre class="model-result codeblock" *ngIf="!editMode"
+             style=" overflow: scroll; width: calc( 100% - 10px ); height: 100px">{{model_input_string}}</pre>
+        <div class="form-description">Output:  <span *ngIf="isValid == true" style="color: green" class="form-valid">✓</span> <span *ngIf="isValid === false" style="color: red"  class="form-invalid">⨉</span></div>
+        <pre class="model-result  codeblock" *ngIf="!editMode"
+             style=" overflow: scroll; width: calc( 100% - 10px ); height: calc( 100% - 135px )">{{model_string}}</pre>
+        <textarea *ngIf="editMode" [(ngModel)]="modelJson"
+                  style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
+      </div>
     </div>
 
     <split-bar
@@ -44,8 +49,10 @@
 
     <div style="display: flex">
       <div class="angular-stuff-menu" style="flex: 1">
-        <div class="btn bWide" [class.active]="editMode" (click)="toggleEdit()"><span *ngIf="!editMode">Edit Form</span><span *ngIf="editMode">Apply Changes</span></div>
-        <div class="btn bWide yellow" *ngIf="editMode" (click)="cancelEdit()"  style="width: 200px; margin-left: 20px" ><span>Cancel</span></div>
+        <div class="btn bWide" [class.active]="editMode" (click)="toggleEdit()"><span *ngIf="!editMode">Edit Form</span><span
+          *ngIf="editMode">Apply Changes</span></div>
+        <div class="btn bWide yellow" *ngIf="editMode" (click)="cancelEdit()" style="width: 200px; margin-left: 20px">
+          <span>Cancel</span></div>
       </div>
     </div>
 
@@ -56,9 +63,15 @@
   <div *ngIf="asyncFormOptionsObservable">
     <div style="margin: 10px 0">
       Update the Options Observable with the Options below:
-      <button (click)="form3UpdateSelection()">update</button>
+      <div style="display: flex; margin: 10px 0;">
+        <input type="text" style="flex: 1" [(ngModel)]="selectOptionsJson1"/>
+        <button (click)="form3UpdateSelection(selectOptionsJson1)">update</button>
+      </div>
+      <div style="display: flex; margin: 10px 0;">
+        <input type="text" style="flex: 1" [(ngModel)]="selectOptionsJson2"/>
+        <button (click)="form3UpdateSelection(selectOptionsJson2)">update</button>
+      </div>
     </div>
-    <input type="text" style="width: calc(100% - 20px)" [(ngModel)]="selectOptionsJson"/>
   </div>
 
 </div>

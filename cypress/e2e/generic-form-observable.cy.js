@@ -18,7 +18,7 @@ describe('generic-form-observable', () => {
     cy.get('pre.model-result').should('contain', '"some_number": 1');
     cy.get('pre.model-result').should('contain', '"select_options": null');
 
-    cy.getSettled('button:contains("update")').click();
+    cy.getSettled('button:contains("update"):eq(0)').click();
     cy.get('.generic-form-control:contains("SelectOptions")').then(withinSubject => {
       cy.get('pre.model-result').should('contain', '"select_options": "foo"');
       cy.get('.generic-form-error:contains("option error")', {withinSubject}).should('not.exist');

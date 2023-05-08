@@ -16,7 +16,6 @@ export const formDef3: FormDefinition = {
     caption: 'Strings 2', type: 'array',
     elements: {
       type: 'text',
-      layout: 'wide',
       required: true,
     },
     minLength: 3,

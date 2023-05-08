@@ -67,6 +67,7 @@ import {ButtonControl, ButtonLayoutPosition, ControlDef, WidgetControl} from './
       <div class="generic-form-input-array-item"
            *ngFor="let childControl of control.arrayElements; let idx = index;  trackBy:trackArrayElement"
            [attr.array-index]="idx"
+           [class.error]="validationResult[childControl.path]"
            [class.hovered]="childControl.hover"
            [class.hovered_delete]="childControl.hover === 'delete'"
       >
@@ -193,10 +194,10 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
       this.widgetControl.value = value;
     });
 
-    const wasCorrected = this.genericFormComponent.wasCorrected(this.control.path, this.value);
-    if (wasCorrected) {
-      this.genericFormComponent.setValue(this.control.path, this.value);
-    }
+    // const wasCorrected = this.genericFormComponent.wasCorrected(this.control.path, this.value);
+    // if (wasCorrected) {
+    //   this.genericFormComponent.setValue(this.control.path, this.value);
+    // }
 
     setTimeout(()=>{
       if (this.control.element.type === 'array'){

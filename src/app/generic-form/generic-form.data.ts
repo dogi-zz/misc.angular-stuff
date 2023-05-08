@@ -46,7 +46,7 @@ export type FormDefBaseInlineElement = {
   inline: true;
 };
 
-export type FormDefCondition = { path: string, value: any, condition?: 'eq' | 'ne' };
+export type FormDefCondition = { path: string, condition?: 'eq' | 'ne', value: any };
 
 export type FormDefBaseConditionElement = {
   condition?: FormDefCondition;

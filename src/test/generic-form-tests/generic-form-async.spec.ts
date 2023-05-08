@@ -361,18 +361,26 @@ describe('generic-form', () => {
     formInstance = new GenericFormInstance(formDefinition);
 
     expect(await getValidationResults({position: null})).toEqual({
-      object: undefined,
+      object: {
+        position: {
+          posX: null,
+          posY: null,
+        },
+      },
       fistErrors: {
-        '.position': 'this is required',
+        '.position.posX': 'this is required',
+        '.position.posY': 'this is required',
       },
       secondErrors: {
-        '.position': 'this is required',
+        '.position': 'my object error',
+        '.position.posX': 'this is required',
+        '.position.posY': 'this is required',
       },
     });
 
     expect(await getValidationResults({position: {posX: 1}})).toEqual({
       object: {
-        position:  {posX: 1, posY: null},
+        position: {posX: 1, posY: null},
       },
       fistErrors: {
         '.position.posY': 'this is required',

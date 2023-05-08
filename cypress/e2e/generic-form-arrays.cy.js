@@ -61,23 +61,8 @@ describe('generic-form-arrays', () => {
     const selector = '.generic-form-control:contains("Strings 2")';
 
     cy.get(selector).should('exist');
-    cy.get(selector).should('have.class', 'error');
 
     cy.getSettled(`${selector} input:eq(1)`).type('foo');
-
-    cy.get(`${selector} input`).should('have.length', 2);
-    cy.get('pre.model-result').should('contain', [
-      '"strings_2": [',
-      '  "element 1",',
-      '  "foo"',
-      ']'
-    ].join('\n  '));
-    cy.get(`${selector} input:eq(0)`).should('have.value', 'element 1');
-    cy.get(`${selector} input:eq(1)`).should('have.value', 'foo');
-
-    cy.get(selector).should('have.class', 'error');
-
-    cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
     cy.get(`${selector} input`).should('have.length', 3);
     cy.get('pre.model-result').should('contain', [
@@ -87,8 +72,8 @@ describe('generic-form-arrays', () => {
       '  null',
       ']'
     ].join('\n  '));
-
-    cy.get(selector).should('not.have.class', 'error');
+    cy.get(`${selector} input:eq(0)`).should('have.value', 'element 1');
+    cy.get(`${selector} input:eq(1)`).should('have.value', 'foo');
 
     cy.getSettled(`${selector} .generic-form-input-array-add-button img`).click();
 
@@ -104,8 +89,7 @@ describe('generic-form-arrays', () => {
 
     cy.get(selector).should('not.have.class', 'error');
 
-    cy.get(`${selector} .generic-form-input-array-add-button img`).should('not.exist');
-
+    cy.get(`${selector} .generic-form-input-array-add-button img`).should('not.exist')
   });
 
   it('Array with Required String', () => {
@@ -249,7 +233,8 @@ describe('generic-form-arrays', () => {
       '"array_1": [',
       '  null,',
       '  [',
-      '    "text 4"',
+      '    "text 4",',
+      '    null',
       '  ]',
       ']'
     ].join('\n  '));
@@ -260,9 +245,13 @@ describe('generic-form-arrays', () => {
 
     cy.get('pre.model-result').should('contain', [
       '"array_1": [',
-      '  [],',
       '  [',
-      '    "text 4"',
+      '    "text 1",',
+      '    "text 2"',
+      '  ],',
+      '  [',
+      '    "text 4",',
+      '    null',
       '  ]',
       ']'
     ].join('\n  '));

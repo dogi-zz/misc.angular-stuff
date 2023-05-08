@@ -31,16 +31,22 @@ export const formDef4: FormDefinition = {
 
 };
 
-export const formDef4Options = [
+export const formDef4Options1 = [
   {label: 'unknown', value: null},
   {label: 'Option 1', value: 'opt_1'},
   {label: 'Option 123', value: 123},
   {label: 'Option 3', value: 'foo'},
 ];
 
+export const formDef4Options2 = [
+  {label: 'unknown', value: null},
+  {label: 'Option 1', value: 'opt_1'},
+  {label: 'Option 234', value: 234},
+];
+
 export const model4: any = {
   select_options: 'foo',
-  position: {posX: 1, posY: 1}
+  position: {posX: 1, posY: 1},
 };
 
 

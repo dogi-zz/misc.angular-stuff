@@ -11,50 +11,51 @@ import {ButtonControl, ControlDef} from './generic-form-component.data';
   selector: '[generic-form-form]',
   template: `
     <ng-container *ngFor="let control of formData">
+      <ng-container *ngIf="control.visible">
+        <div class="generic-form-control"
+             [class.error]="validationResult[control.path]"
+             [class.hovered]="control.hover"
+             [class.hovered_add]="control.hover === 'add'"
+             [class.hovered_delete]="control.hover === 'delete'"
 
-      <div class="generic-form-control"
-           [class.error]="validationResult[control.path]"
-           [class.hovered]="control.hover"
-           [class.hovered_add]="control.hover === 'add'"
-           [class.hovered_delete]="control.hover === 'delete'"
+             [class.generic-form-control-text]="control.element.type === 'text'"
+             [class.generic-form-control-number]="control.element.type === 'number'"
+             [class.generic-form-control-integer]="control.element.type === 'integer'"
+             [class.generic-form-control-boolean]="control.element.type === 'boolean'"
+             [class.generic-form-control-selection]="control.element.type === 'selection'"
+             [class.generic-form-control-object]="control.element.type === 'object'"
+             [class.generic-form-control-array]="control.element.type === 'array'"
 
-           [class.generic-form-control-text]="control.element.type === 'text'"
-           [class.generic-form-control-number]="control.element.type === 'number'"
-           [class.generic-form-control-integer]="control.element.type === 'integer'"
-           [class.generic-form-control-boolean]="control.element.type === 'boolean'"
-           [class.generic-form-control-selection]="control.element.type === 'selection'"
-           [class.generic-form-control-object]="control.element.type === 'object'"
-           [class.generic-form-control-array]="control.element.type === 'array'"
+             [class.wide]="control.element.type === 'text' && control.element.layout === 'wide'"
+             [class.empty]="control.valueIsEmpty"
 
-           [class.wide]="control.element.type === 'text' && control.element.layout === 'wide'"
-           [class.empty]="control.valueIsEmpty"
-
-           *ngIf="control.element">
+             *ngIf="control.element">
 
 
-        <app-generic-form-caption remove-wrapper
-                                  cssClass="generic-form-caption-before-control" [layoutPosition]="'BeforeControl'"
-                                  [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
+          <app-generic-form-caption remove-wrapper
+                                    cssClass="generic-form-caption-before-control" [layoutPosition]="'BeforeControl'"
+                                    [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
 
-        <div class="generic-form-content"
-             generic-form-control
-             [control]="control"
-             [validationResult]="validationResult">
+          <div class="generic-form-content"
+               generic-form-control
+               [control]="control"
+               [validationResult]="validationResult">
+          </div>
+
+          <app-generic-form-caption remove-wrapper
+                                    cssClass="generic-form-caption-after-control" [layoutPosition]="'AfterControl'"
+                                    [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
+
         </div>
 
-        <app-generic-form-caption remove-wrapper
-                                  cssClass="generic-form-caption-after-control" [layoutPosition]="'AfterControl'"
-                                  [control]="control" [isEmpty]="control.valueIsEmpty" [validationResult]="validationResult"></app-generic-form-caption>
+        <div generic-form-form class="generic-form-form generic-form-form-inline"
+             *ngIf="control.elementInline"
+             [formDef]="control.elementInlineProperties"
+             [path]="control.path"
+             [internModel]="(control.value$|async)"
+             [validationResult]="validationResult"></div>
 
-      </div>
-
-      <div generic-form-form class="generic-form-form generic-form-form-inline"
-           *ngIf="control.elementInline"
-           [formDef]="control.elementInlineProperties"
-           [path]="control.path"
-           [internModel]="(control.value$|async)"
-           [validationResult]="validationResult"></div>
-
+      </ng-container>
     </ng-container>
   `,
 })
@@ -72,7 +73,7 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
   @Input()
   public validationResult: FormValidationResult;
 
-  public formData: (ControlDef & { hover?: 'delete' | 'add' })[];
+  public formData: ControlDef[];
 
   constructor(
     private genericFormComponent: GenericFormComponent,
@@ -103,13 +104,16 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
       if (elementDef.type === 'subform') {
         this.buildFormFillFormData(elementDef.content);
       } else {
-        this.formData.push(this.getControlDefOfElement(key, elementDef));
+        const controlDefOfElement = this.getControlDefOfElement(key, elementDef);
+        this.formData.push(controlDefOfElement);
+        controlDefOfElement.visible = this.genericFormComponent.formInstance.visiblePaths[controlDefOfElement.path];
       }
     });
   }
 
   private loadInternModel() {
     this.formData.forEach(controlDef => {
+      controlDef.visible = this.genericFormComponent.formInstance.visiblePaths[controlDef.path];
       this.loadInternModelValue(controlDef, this.internModel?.[controlDef.key]);
     });
   }
@@ -155,7 +159,6 @@ export class GenericFormFormComponent implements OnInit, OnChanges {
       }
       const addItemButtonControl: ButtonControl = {
         action: () => {
-          console.info("HIER ADDD")
           addItemButtonControl.mouseLeave();
           this.addArrayElement(controlDef);
         },

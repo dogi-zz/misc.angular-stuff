@@ -43,7 +43,8 @@ describe('generic-form-objects', () => {
     expect(getOutputValue({name: 'foo', position: []})).toEqual({name: 'foo', position: {posX: null, posY: null}});
 
     expect(getValidationResult({})).toEqual({
-      '.position': ValidationTexts.required,
+      '.position.posX': ValidationTexts.required,
+      '.position.posY': ValidationTexts.required,
     });
 
     expect(getValidationResult({
@@ -55,7 +56,8 @@ describe('generic-form-objects', () => {
     expect(getValidationResult({
       position: '',
     })).toEqual({
-      '.position': ValidationTexts.typeError,
+      '.position.posX': ValidationTexts.required,
+      '.position.posY': ValidationTexts.required,
     });
 
     expect(getValidationResult({
@@ -153,7 +155,8 @@ describe('generic-form-objects', () => {
     formInstance.setModel({});
 
     expect(formInstance.outputModel.value).toEqual({name: null, position: {posX: null, posY: null}});
-    expect(formInstance.errors.value['.position']).toEqual(ValidationTexts.required);
+    expect(formInstance.errors.value['.position.posX']).toEqual(ValidationTexts.required);
+    expect(formInstance.errors.value['.position.posY']).toEqual(ValidationTexts.required);
 
     formInstance.setValue('.position', {});
     expect(formInstance.outputModel.value).toEqual({name: null, position: {posX: null, posY: null}});
@@ -291,9 +294,7 @@ describe('generic-form-objects', () => {
 
     expect(getValidationResult({})).toEqual({});
     expect(getValidationResult({array1: null})).toEqual({});
-    expect(getValidationResult({array1: ['1']})).toEqual({
-      '.array1': ValidationTexts.arrayMin.replace('${}', '2'),
-    });
+    expect(getValidationResult({array1: ['1']})).toEqual({});
     expect(getValidationResult({array1: ['1', '2']})).toEqual({});
     expect(getValidationResult({array1: ['1', '2', '3']})).toEqual({});
     expect(getValidationResult({array1: ['1', '2', '3', '4']})).toEqual({});
@@ -344,48 +345,48 @@ describe('generic-form-objects', () => {
 
     formInstance.setValue('.array1', []);
 
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: [], array2: []});
-    expect(formInstance.errors.value['.array1']).toEqual(ValidationTexts.arrayMin.replace('${}', '2'));
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null], array2: []});
+    expect(formInstance.errors.value['.array1']).toEqual(undefined);
     expect(formInstance.errors.value['.array2']).toEqual(undefined);
 
     formInstance.addToArray('.array1', 'foo');
     formInstance.addToArray('.array1', 123);
 
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', null], array2: []});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null, 'foo', null], array2: []});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.1']).toEqual(ValidationTexts.typeError);
+    expect(formInstance.errors.value['.array1.2']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.3']).toEqual(ValidationTexts.typeError);
     expect(formInstance.errors.value['.array2']).toEqual(undefined);
 
-    formInstance.setValue('.array1.1', '123');
+    formInstance.setValue('.array1.3', '123');
 
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: []});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null, 'foo', '123'], array2: []});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.1']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.2']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.3']).toEqual(undefined);
     expect(formInstance.errors.value['.array2']).toEqual(undefined);
 
 
     formInstance.setValue('.array2', []);
 
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: []});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null,'foo', '123'], array2: []});
     expect(formInstance.errors.value['.array2']).toEqual(undefined);
 
     formInstance.addToArray('.array2', 'foo');
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: [null]});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null,'foo', '123'], array2: [null]});
     expect(formInstance.errors.value['.array2.0']).toEqual(ValidationTexts.typeError);
 
     formInstance.setValue('.array2.0', []);
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: [null]});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null,'foo', '123'], array2: [null]});
     expect(formInstance.errors.value['.array2.0']).toEqual(ValidationTexts.typeError);
 
     formInstance.setValue('.array2.0', {});
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: [{posX: null, posY: null}]});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null,'foo', '123'], array2: [{posX: null, posY: null}]});
     expect(formInstance.errors.value['.array2.0']).toEqual(undefined);
     expect(formInstance.errors.value['.array2.0.posX']).toEqual(ValidationTexts.required);
 
     formInstance.setValue('.array2.0.posX', {});
-    expect(formInstance.outputModel.value).toEqual({name: null, array1: ['foo', '123'], array2: [{posX: null, posY: null}]});
+    expect(formInstance.outputModel.value).toEqual({name: null, array1: [null, null,'foo', '123'], array2: [{posX: null, posY: null}]});
     expect(formInstance.errors.value['.array2.0']).toEqual(undefined);
     expect(formInstance.errors.value['.array2.0.posX']).toEqual(ValidationTexts.typeError);
   });
@@ -575,27 +576,23 @@ describe('generic-form-objects', () => {
     };
     formInstance = new GenericFormInstance(formDefinition);
 
-    expect(getOutputValue({})).toEqual({array1: []});
-    expect(getOutputValue({array1: true})).toEqual({array1: []});
-    expect(getOutputValue({array1: 'foo'})).toEqual({array1: []});
-    expect(getOutputValue({array1: null})).toEqual({array1: []});
+    expect(getOutputValue({})).toEqual({array1: [[null], [null]]});
+    expect(getOutputValue({array1: true})).toEqual({array1: [[null], [null]]});
+    expect(getOutputValue({array1: 'foo'})).toEqual({array1: [[null], [null]]});
+    expect(getOutputValue({array1: null})).toEqual({array1: [[null], [null]]});
 
-    expect(getValidationResult({})).toEqual({
-      '.array1': ValidationTexts.arrayMin.replace('${}', '2'),
-    });
+    expect(getValidationResult({})).toEqual({  });
+      // '.array1': ValidationTexts.arrayMin.replace('${}', '2'),
+
     expect(getValidationResult({array1: true})).toEqual({
       '.array1': ValidationTexts.typeError,
     });
     expect(getValidationResult({array1: 'foo'})).toEqual({
       '.array1': ValidationTexts.typeError,
     });
-    expect(getValidationResult({array1: []})).toEqual({
-      '.array1': ValidationTexts.arrayMin.replace('${}', '2'),
-    });
+    expect(getValidationResult({array1: []})).toEqual({});
     expect(getValidationResult({array1: [null, [], 1, 2, 3]})).toEqual({
       '.array1': ValidationTexts.arrayMax.replace('${}', '4'),
-      '.array1.0': ValidationTexts.arrayMin.replace('${}', '1'),
-      '.array1.1': ValidationTexts.arrayMin.replace('${}', '1'),
       '.array1.2': ValidationTexts.typeError,
       '.array1.3': ValidationTexts.typeError,
       '.array1.4': ValidationTexts.typeError,
@@ -651,58 +648,59 @@ describe('generic-form-objects', () => {
     formInstance = new GenericFormInstance(formDefinition);
 
     formInstance.setModel({});
-    expect(formInstance.outputModel.value).toEqual({array1: []});
-    expect(formInstance.errors.value['.array1']).toEqual(ValidationTexts.arrayMin.replace('${}', '2'));
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null]]});
+    expect(formInstance.errors.value['.array1']).toEqual(undefined);
 
     formInstance.setValue('.array1', 123);
     expect(formInstance.outputModel.value).toEqual({array1: []});
     expect(formInstance.errors.value['.array1']).toEqual(ValidationTexts.typeError);
 
     formInstance.setValue('.array1', []);
-    expect(formInstance.outputModel.value).toEqual({array1: []});
-    expect(formInstance.errors.value['.array1']).toEqual(ValidationTexts.arrayMin.replace('${}', '2'));
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null]]});
+    expect(formInstance.errors.value['.array1']).toEqual(undefined);
 
     formInstance.addToArray('.array1', 'test');
     formInstance.addToArray('.array1', []);
 
-    expect(formInstance.outputModel.value).toEqual({array1: [[], []]});
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null], [null], [null]]});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(ValidationTexts.typeError);
-    expect(formInstance.errors.value['.array1.1']).toEqual(ValidationTexts.arrayMin.replace('${}', '1'));
+    expect(formInstance.errors.value['.array1.2']).toEqual(ValidationTexts.typeError);
+    expect(formInstance.errors.value['.array1.3']).toEqual(undefined);
 
-    formInstance.addToArray('.array1.1', null);
+    formInstance.addToArray('.array1.3', null);
 
-    expect(formInstance.outputModel.value).toEqual({array1: [[], [null]]});
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null], [null], [null, null]]});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(ValidationTexts.typeError);
-    expect(formInstance.errors.value['.array1.1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.1.0']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.2']).toEqual(ValidationTexts.typeError);
+    expect(formInstance.errors.value['.array1.3']).toEqual(ValidationTexts.arrayMax.replace('${}', '1'));
+    expect(formInstance.errors.value['.array1.3.0']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.3.1']).toEqual(undefined);
 
 
-    formInstance.setValue('.array1.1.0', 'foo');
+    formInstance.setValue('.array1.3.0', 'foo');
 
-    expect(formInstance.outputModel.value).toEqual({array1: [[], [null]]});
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null], [null], [null, null]]});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(ValidationTexts.typeError);
-    expect(formInstance.errors.value['.array1.1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.1.0']).toEqual(ValidationTexts.optionError);
+    expect(formInstance.errors.value['.array1.2']).toEqual(ValidationTexts.typeError);
+    expect(formInstance.errors.value['.array1.3.0']).toEqual(ValidationTexts.optionError);
+    expect(formInstance.errors.value['.array1.3.1']).toEqual(undefined);
 
     options1.next([
       {label: 'var1', value: 'foo'},
       {label: 'var2', value: 'bar'},
     ]);
 
-    expect(formInstance.outputModel.value).toEqual({array1: [[], ['foo']]});
+    expect(formInstance.outputModel.value).toEqual({array1: [[null], [null], [null], ['foo', null]]});
     expect(formInstance.errors.value['.array1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.0']).toEqual(ValidationTexts.typeError);
-    expect(formInstance.errors.value['.array1.1']).toEqual(undefined);
-    expect(formInstance.errors.value['.array1.1.0']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.2']).toEqual(ValidationTexts.typeError);
+    expect(formInstance.errors.value['.array1.3.0']).toEqual(undefined);
+    expect(formInstance.errors.value['.array1.3.1']).toEqual(undefined);
 
 
   });
 
 
-  it.only('Remove Value from Array', async () => {
+  it('Remove Value from Array', async () => {
     let formInstance: GenericFormInstance;
     let formDefinition: FormDefinition;
 

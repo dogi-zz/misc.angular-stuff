@@ -77,7 +77,7 @@ const splitArrayIndexFromPath = (arrayPath: string, childPath: string, callback:
     if (match) {
       const index = parseInt(match[1], 10);
       if (!isNaN(index)) {
-        callback(index, match[2])
+        callback(index, match[2]);
       }
     }
   }
@@ -99,6 +99,7 @@ export class GenericFormInstance {
 
   public inputModel: FormModel;
   public internItemInstance: { [propertyName: string]: ResolvedFormItemInstance };
+  public visiblePaths: { [path: string]: boolean };
 
   private resolvedDefinitions: ResolvedFormItemDefinition[];
   private conditionValueObservers: { [observedPath: string]: string[] } = {};
@@ -129,6 +130,7 @@ export class GenericFormInstance {
     this.inputModel = _.cloneDeep(model);
     this.internItemInstance = {};
     this.setUserValues = {};
+    this.visiblePaths = {};
 
     this.selectionSubscriptions.splice(0).forEach(s => s.unsubscribe());
 
@@ -231,9 +233,9 @@ export class GenericFormInstance {
     while (changedPathList.length && counter < Math.min(this.maxConditionApplyCount, 1)) {
       counter++;
       changedPathList.splice(0);
+      this.visiblePaths = {};
       this.readObject('', this.inputModel, newResultValue, this.internItemInstance);
       this.applyObject('', newResultValue, this.internItemInstance, changedPathList);
-
     }
 
     this.validationPromises = [];
@@ -302,13 +304,20 @@ export class GenericFormInstance {
         throw new Error('Not Implemented'); //TODO
       } else {
         const subPath = getSubPath(path, propertyName);
-        const resolvedOriginalValue = isObject(this.setUserValues[path]) ? this.setUserValues[path] : isObject(originalValue) ? originalValue : {};
+        let resolvedOriginalValue;
+        if (isObject(this.setUserValues[path])){
+          resolvedOriginalValue = this.setUserValues[path];
+        } else if (isObject(originalValue) && originalValue[propertyName] !== undefined){
+          resolvedOriginalValue = originalValue;
+        } else if (isObject(actualValue) && actualValue[propertyName] !== undefined){
+          resolvedOriginalValue = actualValue;
+        }
         this.readSingleElement(subPath, resolvedOriginalValue?.[propertyName], actualValue?.[propertyName], target, propertyName);
       }
     }
   }
 
-  private readArray(path: string, originalValue: any, actualValue: any, target: ResolvedFormItemInstance[]) {
+  private readArray(def: FormDefArray, path: string, originalValue: any, actualValue: any, target: ResolvedFormItemInstance[]) {
     verbose('....readArray', path);
     const resolvedOriginalValue: any[] = isArray(this.setUserValues[path]) ? this.setUserValues[path] : isArray(originalValue) ? originalValue : [];
 
@@ -316,12 +325,10 @@ export class GenericFormInstance {
       const subPath = getSubPath(path, idx);
       this.readSingleElement(subPath, resolvedOriginalValue?.[idx], actualValue?.[idx], target, idx);
     });
-    //if (originalValue && Array.isArray(originalValue)) {
-    //   originalValue.forEach(originalValueItem => {
-    //     const resultItem = this.readSingleElement(def, originalValueItem, conditions);
-    //     target.push(resultItem);
-    //   });
-    // }
+    for (let idx = target.length; idx < def.minLength || 0; idx++ ){
+      const subPath = getSubPath(path, idx);
+      this.readSingleElement(subPath, null, null, target, idx);
+    }
   }
 
   private checkConditions(path: string, conditions: FormDefCondition[]): boolean {
@@ -331,12 +338,12 @@ export class GenericFormInstance {
       const conditionPath = getPathForCondition(parentPath, c.path);
       const conditionElement = this.getInternItemForPath(conditionPath);
       if ((c.condition ?? null) === null || c.condition === 'eq') {
-        if (conditionElement.actualValue !== (c.value ?? null)) {
+        if ((conditionElement?.actualValue ?? null) !== (c.value ?? null)) {
           result = false;
         }
       }
       if (c.condition === 'ne') {
-        if (conditionElement.actualValue === (c.value ?? null)) {
+        if ((conditionElement?.actualValue ?? null) === (c.value ?? null)) {
           result = false;
         }
       }
@@ -346,15 +353,16 @@ export class GenericFormInstance {
 
   private readSingleElement(path: string, originalValue: any, actualValue: any, target: { [propertyName: string]: ResolvedFormItemInstance } | ResolvedFormItemInstance[], propertyName: string | number): void {
     verbose('....readSingleElement', path, target);
+    let fondMatchedCondition = false;
+    this.visiblePaths[path] = false;
     for (const definition of this.getSingleDefinition(path)) {
       if (definition.conditions.length) {
         if (!this.checkConditions(path, definition.conditions)) {
-          if (target[propertyName]) {
-            delete target[propertyName];
-          }
           continue;
         }
       }
+      fondMatchedCondition = true;
+      this.visiblePaths[path] = true;
 
       const result: ResolvedFormItemInstance = target[propertyName] || {path, definition, originalValue: actualValue === undefined ? originalValue : actualValue, userValue: null, actualValue: null};
       target[propertyName] = result;
@@ -388,22 +396,19 @@ export class GenericFormInstance {
       } else if (def.type === 'object') {
         result.objectChildren = result.objectChildren || {};
         result.arrayChildren = null;
-        // if (originalValue && typeof originalValue === 'object' && !Array.isArray(originalValue)) {
-        //   result.originalValue = {};
-        // }
         this.readObject(path, originalValue, actualValue, result.objectChildren);
       } else if (def.type === 'array') {
         result.objectChildren = null;
         result.arrayChildren = result.arrayChildren || [];
-        // const result: ResolvedFormItemInstance = {path, definition, originalValue, userValue: null, actualValue: null};
-        // if (originalValue && typeof originalValue === 'object' && Array.isArray(originalValue)) {
-        //   //this.readArray(def.elements, originalValue, result.arrayValue);
-        //   throw new Error('Not Implemented');
-        // }
-        // target[propertyName] = result;
-        this.readArray(path, originalValue, actualValue, result.arrayChildren);
+        this.readArray(def, path, originalValue, actualValue, result.arrayChildren);
       } else {
         throw new Error(`invalid form value definition ${(def as any).type}`);
+      }
+    }
+
+    if (!fondMatchedCondition) {
+      if ((target[propertyName] ?? null) !== null) {
+        delete target[propertyName];
       }
     }
     return null;
@@ -419,22 +424,15 @@ export class GenericFormInstance {
 
     const existingProperties: string[] = [];
     for (const [propertyName, definition] of this.getObjectDefinition(path)) {
-      if (definition.def.type === 'subform') {
-        // if (def.condition) {
-        //   const active = checkConditionTargetObject(def.condition, target);
-        //   if (!active) {
-        //     continue;
-        //   }
-        // }
-        // this.applyObject(def.content, source, target);
-        throw new Error('not implemented'); // TODO
-      } else {
+      if (definition.def.type !== 'subform') {
         const subPath = getSubPath(path, propertyName);
         const item = itemInstance[propertyName];
         if (item) {
           existingProperties.push(propertyName);
           this.applySingleElement(subPath, item, target, propertyName, changedPathList);
         }
+      } else {
+        throw new Error('Invalid call');
       }
     }
     Object.keys(target).forEach(propertyName => {
@@ -675,7 +673,7 @@ export class GenericFormInstance {
   protected validateObjectValue(path: string, item: ResolvedFormItemInstance, errors: { [path: string]: string }) {
     const def: FormDefObject | (FormDefObject & FormDefBaseInlineElement) = item.definition.def as any;
 
-    let valueToValidate = Object.keys(this.setUserValues).includes(path) ? this.setUserValues[path] : item?.originalValue;
+    let valueToValidate = Object.keys(this.setUserValues).includes(path) ? this.setUserValues[path] : (item?.originalValue || item.actualValue);
 
     if ((valueToValidate ?? null) !== null && !isObject(valueToValidate)) {
       errors[path] = ValidationTexts.typeError;
@@ -775,9 +773,8 @@ export class GenericFormInstance {
         instanceItem.arrayChildren = null;
       } else {
         instanceItem.arrayChildren = [];
-        this.readArray(path, value, value, instanceItem.arrayChildren);
+        this.readArray(instanceItem.definition.def, path, value, value, instanceItem.arrayChildren);
       }
-
     }
   }
 
@@ -831,45 +828,45 @@ export class GenericFormInstance {
   }
 
 
-  private getItemFromPathInArray(path: string, resolvedDefinition: ResolvedFormItemDefinition, instanceItem: ResolvedFormItemInstance): { instanceItem: ResolvedFormItemInstance, resolvedDefinition: ResolvedFormItemDefinition } {
-    // const subPathMatch = path.match(/\.([^.]*)/);
-    // const subItemIndex = parseInt(subPathMatch[1], 10);
-    // if (isNaN(subItemIndex)) {
-    //   throw new Error('Illegal Array index at ' + path);
-    // }
-    // const def = resolvedDefinition[1] as FormDefArray;
-    // const subSubPath = path.substring(subPathMatch[0].length);
-    // const subInstanceItem = instanceItem.arrayValue[subItemIndex];
-    // const subDef: FormDefElement = def.elements;
-    // const resolvedSubDef: ResolvedDefinitionItem = [null, subDef as any, resolvedDefinition[2]];
-    // if (!subSubPath.length) {
-    //   return {instanceItem: subInstanceItem, resolvedDefinition: resolvedSubDef};
-    // } else if (subDef.type === 'object') {
-    //   return this.getItemFromPath(subSubPath, subInstanceItem.resolvedDefinitions, subInstanceItem.objectValue);
-    // } else if (subDef.type === 'array') {
-    //   return this.getItemFromPathInArray(subSubPath, resolvedSubDef, subInstanceItem);
-    // } else {
-    //   throw new Error('illegal situation in getItemFromPathInArray');
-    // }
-    return null; // TODO
-  }
-
-
-  public wasCorrected(path: string, value: any) {
-    // try {
-    //   const {instanceItem, resolvedDefinition} = this.getItemFromPath(path, this.resolvedDefinitions, this.internInstanceItem);
-    //
-    //   if (resolvedDefinition.type === 'array' && (resolvedDefinition as any as FormDefBaseElementCaption).required) {
-    //     if (!instanceItem.originalValue && !instanceItem.userValue && _.isEqual(value, [])) {
-    //       return true;
-    //     }
-    //   }
-    //
-    //   return false;
-    // } catch (e) {
-    //   return false;
-    // }
-    return null;//TODO
-  }
+  // private getItemFromPathInArray(path: string, resolvedDefinition: ResolvedFormItemDefinition, instanceItem: ResolvedFormItemInstance): { instanceItem: ResolvedFormItemInstance, resolvedDefinition: ResolvedFormItemDefinition } {
+  //   // const subPathMatch = path.match(/\.([^.]*)/);
+  //   // const subItemIndex = parseInt(subPathMatch[1], 10);
+  //   // if (isNaN(subItemIndex)) {
+  //   //   throw new Error('Illegal Array index at ' + path);
+  //   // }
+  //   // const def = resolvedDefinition[1] as FormDefArray;
+  //   // const subSubPath = path.substring(subPathMatch[0].length);
+  //   // const subInstanceItem = instanceItem.arrayValue[subItemIndex];
+  //   // const subDef: FormDefElement = def.elements;
+  //   // const resolvedSubDef: ResolvedDefinitionItem = [null, subDef as any, resolvedDefinition[2]];
+  //   // if (!subSubPath.length) {
+  //   //   return {instanceItem: subInstanceItem, resolvedDefinition: resolvedSubDef};
+  //   // } else if (subDef.type === 'object') {
+  //   //   return this.getItemFromPath(subSubPath, subInstanceItem.resolvedDefinitions, subInstanceItem.objectValue);
+  //   // } else if (subDef.type === 'array') {
+  //   //   return this.getItemFromPathInArray(subSubPath, resolvedSubDef, subInstanceItem);
+  //   // } else {
+  //   //   throw new Error('illegal situation in getItemFromPathInArray');
+  //   // }
+  //   return null; // TODO
+  // }
+  //
+  //
+  // public wasCorrected(path: string, value: any) {
+  //   // try {
+  //   //   const {instanceItem, resolvedDefinition} = this.getItemFromPath(path, this.resolvedDefinitions, this.internInstanceItem);
+  //   //
+  //   //   if (resolvedDefinition.type === 'array' && (resolvedDefinition as any as FormDefBaseElementCaption).required) {
+  //   //     if (!instanceItem.originalValue && !instanceItem.userValue && _.isEqual(value, [])) {
+  //   //       return true;
+  //   //     }
+  //   //   }
+  //   //
+  //   //   return false;
+  //   // } catch (e) {
+  //   //   return false;
+  //   // }
+  //   return null;//TODO
+  // }
 
 }

@@ -14,6 +14,7 @@ export type ControlDef = {
   elementInlineProperties: FormDefinition
 
   hover?: 'delete' | 'add';
+  visible?: boolean;
 
   value$: BehaviorSubject<any>,
   valueIsString?: boolean,
