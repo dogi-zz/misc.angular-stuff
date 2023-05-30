@@ -1,5 +1,5 @@
 import {Observable, Subscriber} from 'rxjs';
-import {FormDefCondition, FormDefElement, FormDefElementNotInline, FormDefElementInline, FormDefObject, FormDefBaseElementRequired} from './generic-form.data';
+import {FormDefBaseElementRequired, FormDefElement, FormDefElementInline, FormDefElementNotInline, FormDefObject} from './generic-form.data';
 
 
 export const elementIsRequired = (def: FormDefElement | { required?: boolean }) => {
@@ -28,6 +28,22 @@ export const formDefGetInlineProperties = (def: FormDefElement) => {
     return def.content;
   }
   return null;
+};
+
+
+export const formDefGetChildByPath = (object: any, path: string) => {
+  const pathParts = path.split('.');
+  let result = object ?? null;
+  pathParts.forEach(part => {
+    if (result !== null && part.match(/^\d+$/)) {
+      result = result[parseInt(part, 10)]
+    } else if (result !== null) {
+      result = result[part]
+    } else {
+      result = null;
+    }
+  });
+  return result;
 };
 
 
@@ -78,15 +94,5 @@ export const checkConditionTargetObjectGetObjectByPath = (path: string[], target
     return target?.[path[0]];
   } else {
     return undefined;
-  }
-};
-
-export const checkConditionTargetObject = (condition: FormDefCondition, target: any) => {
-  const path = condition.path.split('.');
-  const value = checkConditionTargetObjectGetObjectByPath(path, target);
-  if (condition.condition === 'ne') {
-    return condition.value !== value;
-  } else {
-    return condition.value === value;
   }
 };

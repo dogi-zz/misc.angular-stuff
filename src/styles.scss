@@ -14,13 +14,13 @@ body {
 
 @import 'app/generic-form/style/generic-form';
 
-hr{
+hr {
   border-bottom-color: $border-color;
   border-top: none;
 }
 
-h1, h2{
-  font-family:serif;
+h1, h2 {
+  font-family: serif;
   color: $button-color;
   font-weight: bold;
   padding: 10px 0;
@@ -29,29 +29,46 @@ h1, h2{
   border-bottom-color: $border-color;
 }
 
-.angular-stuff-menu{
+.displayFlex {
+  display: flex;
+}
+
+.contentCenter {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex1 {
+  flex: 1;
+}
+
+
+.angular-stuff-menu {
   display: flex;
   margin-top: 20px;
 
   .btn {
-    &.b1{
+    &.b1 {
       margin: 0 20px;
       line-height: 50px;
       height: 50px;
       width: 250px;
     }
-    &.b2{
+
+    &.b2 {
       margin: 0 10px;
       line-height: 25px;
       height: 25px;
       width: 120px;
     }
-    &.bWide{
+
+    &.bWide {
       margin: 0;
       line-height: 50px;
       height: 50px;
       width: 100%;
     }
+
     text-align: center;
     cursor: pointer;
 
@@ -59,9 +76,11 @@ h1, h2{
     transition: all 0.3s;
     position: relative;
   }
+
   .btn.yellow {
     color: $button-yellow-color;
   }
+
   //.btn.active::before{
   //  border-top-width: 1px;
   //  border-bottom-width: 1px;
@@ -73,6 +92,7 @@ h1, h2{
   .btn span {
     transition: all 0.3s;
   }
+
   .btn::before {
     content: '';
     position: absolute;
@@ -91,17 +111,21 @@ h1, h2{
     border-bottom-color: $border-color;
     transform: scale(0.1, 1);
   }
-  .btn.yellow::before{
+
+  .btn.yellow::before {
     border-top-color: $border-yellow-color;
     border-bottom-color: $border-yellow-color;
   }
+
   .btn:not(.active):hover span {
     letter-spacing: 2px;
   }
+
   .btn:not(.active):hover::before, .btn.active::before {
     opacity: 1;
     transform: scale(1, 1);
   }
+
   .btn:not(.active)::after {
     content: '';
     position: absolute;
@@ -113,9 +137,11 @@ h1, h2{
     transition: all 0.3s;
     background-color: $background-color;
   }
+
   .btn.yellow:not(.active)::after {
     background-color: $background-yellow-color;
   }
+
   .btn:not(.active):hover::after {
     opacity: 0;
     transform: scale(0.1, 1);
@@ -124,19 +150,21 @@ h1, h2{
 }
 
 
-pre.codeblock{
+pre.codeblock {
   border: 1px solid;
   border-color: $border-color;
   background: $background-color;
   margin-top: 0;
 }
 
-div.form-description{
+div.form-description {
   font-family: "Open Sans", sans-serif;
   font-size: 14px;
-  color: #515C66;
+  color: $button-color;
+  font-weight: bold;
+  margin: 5px 0;
 }
 
-img.add-button{
+img.add-button {
   cursor: pointer;
 }

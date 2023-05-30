@@ -37,8 +37,8 @@
      style="margin: 20px; display: block; margin-left: 50px; width: calc( 100vw - 100px ); height: 400px; background: #e1e1e1; position: relative">
 
   <info-panel [container]="infoPanelContainer1" [margin]="0">
-    <div
-      style="width: 300px; height: 100px; display: flex; align-items: center; justify-content: center; background: #ced4da">
+    <div class="displayFlex contentCenter"
+      style="width: 300px; height: 100px;  background: #ced4da">
       Here is the info content
     </div>
   </info-panel>
@@ -54,15 +54,15 @@
      style="margin: 20px; display: block; margin-left: 50px; width: calc( 100vw - 100px ); height: 400px; background: #e1e1e1; position: relative">
 
   <info-panel [container]="infoPanelContainer2" [margin]="20" [animate]="1000" [anchor]="'bottom'">
-    <div
-      style="width: 300px; height: 100px; display: flex; align-items: center; justify-content: center; background: #ced4da">
+    <div class="displayFlex contentCenter"
+      style="width: 300px; height: 100px; background: #ced4da">
       This content likes to be at the bottom
     </div>
   </info-panel>
 
   <info-panel [container]="infoPanelContainer2" [margin]="0" [animate]="500" [direction]="'horizontal'">
-    <div
-      style="width: 100px; height: 200px; display: flex; align-items: center; justify-content: center; background: #ced4da">
+    <div class="displayFlex contentCenter"
+      style="width: 100px; height: 200px; background: #ced4da">
       left and right
     </div>
   </info-panel>
@@ -81,8 +81,8 @@
   <info-panel [container]="infoPanelContainer3" [margin]="20" [animate]="500" [direction]="'horizontal'" [sticky]="true"
               [stickyVisible]="stickyPanelVisible">
     <div
-      (click)="hideSticky($event)"
-      style="width: 85px; height: 200px; padding: 10px; display: flex; align-items: center; justify-content: center; background: #ced4da">
+      (click)="hideSticky($event)" class="displayFlex contentCenter"
+      style="width: 85px; height: 200px; padding: 10px; background: #ced4da">
       this is sticky, click to hide
     </div>
   </info-panel>

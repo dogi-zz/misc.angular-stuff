@@ -1,4 +1,5 @@
 import {FormDefinition} from '../generic-form/generic-form.data';
+import {BehaviorSubject} from "rxjs";
 
 
 export const formDef4: FormDefinition = {
@@ -10,7 +11,7 @@ export const formDef4: FormDefinition = {
     type: 'selection',
     caption: 'SelectOptions',
     required: true,
-    options: '{observable}' as any,
+    options: null,
     help: 'simple required selection',
   },
   position: {
@@ -31,6 +32,15 @@ export const formDef4: FormDefinition = {
 
 };
 
+
+export const model4: any = {
+  select_options: 'foo',
+  position: {posX: 1, posY: 1},
+};
+
+
+
+
 export const formDef4Options1 = [
   {label: 'unknown', value: null},
   {label: 'Option 1', value: 'opt_1'},
@@ -44,10 +54,8 @@ export const formDef4Options2 = [
   {label: 'Option 234', value: 234},
 ];
 
-export const model4: any = {
-  select_options: 'foo',
-  position: {posX: 1, posY: 1},
-};
-
-
-
+export const  optionObservables4 : {path: string, jsonString: string}[] = [
+  {path: 'select_options', jsonString: JSON.stringify([])},
+  {path: 'select_options', jsonString: JSON.stringify(formDef4Options1)},
+  {path: 'select_options', jsonString: JSON.stringify(formDef4Options2)},
+]

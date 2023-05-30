@@ -13,25 +13,25 @@
 
 <div style="margin: 10px 20px 20px">
 
-  <div style="display: flex; min-height: 200px" #form1>
+  <div class="displayFlex" style="min-height: 200px" #form1>
 
-    <div style="flex: 1;">
+    <div class="flex1">
       <generic-form *ngIf="!editMode" [formDef]="formDef" [model]="model"
                     (modelChange)="modelChange($event)"  (validChange)="validChange($event)"></generic-form>
       <textarea *ngIf="editMode" [(ngModel)]="formDefJson"
-                style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
+                style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 340px); white-space: nowrap; resize: none"></textarea>
     </div>
 
     <div [ngStyle]="{width: width + 'px'}">
       <div style="margin-left: 10px; ">
-        <div class="form-description">Input:</div>
+        <div class="form-description" *ngIf="!editMode">Input:</div>
         <pre class="model-result codeblock" *ngIf="!editMode"
              style=" overflow: scroll; width: calc( 100% - 10px ); height: 100px">{{model_input_string}}</pre>
-        <div class="form-description">Output:  <span *ngIf="isValid == true" style="color: green" class="form-valid">✓</span> <span *ngIf="isValid === false" style="color: red"  class="form-invalid">⨉</span></div>
+        <div class="form-description" *ngIf="!editMode">Output:  <span *ngIf="isValid == true" style="color: green" class="form-valid">✓</span> <span *ngIf="isValid === false" style="color: red"  class="form-invalid">⨉</span></div>
         <pre class="model-result  codeblock" *ngIf="!editMode"
-             style=" overflow: scroll; width: calc( 100% - 10px ); height: calc( 100% - 135px )">{{model_string}}</pre>
+             style=" overflow: scroll; width: calc( 100% - 10px ); height: calc( 100vh - 380px )">{{model_string}}</pre>
         <textarea *ngIf="editMode" [(ngModel)]="modelJson"
-                  style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 300px); white-space: nowrap; resize: none"></textarea>
+                  style="margin: 0 0 0 10px; width: calc(100% - 15px); height: calc(100vh - 340px); white-space: nowrap; resize: none"></textarea>
       </div>
     </div>
 
@@ -59,17 +59,16 @@
 
   </div>
 
-
-  <div *ngIf="asyncFormOptionsObservable">
+  <div *ngIf="optionObservables.length" >
     <div style="margin: 10px 0">
-      Update the Options Observable with the Options below:
-      <div style="display: flex; margin: 10px 0;">
-        <input type="text" style="flex: 1" [(ngModel)]="selectOptionsJson1"/>
-        <button (click)="form3UpdateSelection(selectOptionsJson1)">update</button>
-      </div>
-      <div style="display: flex; margin: 10px 0;">
-        <input type="text" style="flex: 1" [(ngModel)]="selectOptionsJson2"/>
-        <button (click)="form3UpdateSelection(selectOptionsJson2)">update</button>
+      Update the Options Observable Value:
+      <div *ngFor="let optionObservable of optionObservables; let idx = index" style="margin: 10px 0;" class="optionsSet">
+        <div class="displayFlex">
+          <div>{{optionObservable.path}}:</div>
+          <input type="text" class="flex1" style="margin: 0 10px" [(ngModel)]="optionObservable.jsonString"/>
+          <button (click)="formUpdateSelectionObservable(optionObservable)">update</button>
+        </div>
+
       </div>
     </div>
   </div>

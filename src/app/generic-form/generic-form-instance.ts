@@ -50,11 +50,6 @@ const getParentPath = (path: string) => {
   return path.substring(0, path.lastIndexOf('.'));
 };
 
-const getBaseName = (path: string) => {
-  const name = path.substring(path.lastIndexOf('.'));
-  return name.match(/^\d+$/) ? parseInt(name, 10) : name;
-};
-
 const mergeConditions = (conditions: FormDefCondition[], condition: FormDefCondition): FormDefCondition[] => {
   return condition ? [...conditions, condition] : conditions;
 };

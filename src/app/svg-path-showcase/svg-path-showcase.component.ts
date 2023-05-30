@@ -127,6 +127,7 @@ export class SvgPathShowcaseComponent implements OnInit {
     this.splitPathString1 = SvgPathCurveSegmentImpl.from(pathParts1[0]).svgSinglePathSegment();
     this.splitPathString2 = SvgPathCurveSegmentImpl.from(pathParts2[1]).svgSinglePathSegment();
 
+    // Round Corner
 
     this.roundCornerLines = [];
     const roundCornerPathSegments = [...this.roundCornerPath.segments];
@@ -139,6 +140,9 @@ export class SvgPathShowcaseComponent implements OnInit {
       this.roundCornerLines.push(SvgPathLineSegmentImpl.from({from: roundCornerResult.direction2.point, to: roundCornerResult.circleCenter}).svgSinglePathSegment());
     });
     this.roundCornerString = SvgPathTools.svgPath({segments: roundCornerPathSegments});
+
+    // RingPart
+
 
     const ringInfo = SvgPathTools.getRingPart((this.ringPartValue / 100 * 350 + 5) / 360 * Math.PI * 2, [200, 100], 80, 40, this.ringPartBorderValue / 5 );
     const ringPath: SvgPath = {
