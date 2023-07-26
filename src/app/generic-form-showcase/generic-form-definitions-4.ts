@@ -1,5 +1,4 @@
 import {FormDefinition} from '../generic-form/generic-form.data';
-import {BehaviorSubject} from "rxjs";
 
 
 export const formDef4: FormDefinition = {
@@ -23,11 +22,11 @@ export const formDef4: FormDefinition = {
       posX: {caption: 'PosX', type: 'integer', required: true},
       posY: {caption: 'PosY', type: 'integer', required: true},
     },
-    validate: (value, item) => {
-      return new Promise(res => setTimeout(res, 1000)).then(() => {
-        return value?.posX === value?.posY ? 'The coordinates must not be equal' : null;
-      });
-    },
+    // validate: (value, item) => {
+    //   return new Promise(res => setTimeout(res, 1000)).then(() => {
+    //     return value?.posX === value?.posY ? 'The coordinates must not be equal' : null;
+    //   });
+    // },
   },
 
 };
@@ -39,6 +38,14 @@ export const model4: any = {
 };
 
 
+const funcString = `
+return new Promise(res => setTimeout(res, 1000)).then(() => {
+  return value?.posX === value?.posY ? "The coordinates must not be equal" : null;
+});
+`;
+export const validationFunctions4: { path: string, functionString: string }[] = [
+  {path: 'position', functionString: funcString.trim()},
+];
 
 
 export const formDef4Options1 = [
@@ -54,8 +61,8 @@ export const formDef4Options2 = [
   {label: 'Option 234', value: 234},
 ];
 
-export const  optionObservables4 : {path: string, jsonString: string}[] = [
+export const optionObservables4: { path: string, jsonString: string }[] = [
   {path: 'select_options', jsonString: JSON.stringify([])},
   {path: 'select_options', jsonString: JSON.stringify(formDef4Options1)},
   {path: 'select_options', jsonString: JSON.stringify(formDef4Options2)},
-]
+];

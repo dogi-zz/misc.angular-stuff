@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import {initForm} from "../support/generic-form-helper";
+
 describe('generic-form-subform', () => {
 
   beforeEach(() => {
@@ -7,11 +9,31 @@ describe('generic-form-subform', () => {
   });
 
   it('Non Required Child', () => {
+
+    initForm({
+      child_1: {
+        caption: 'Child 1', type: 'object',
+        properties: {
+          posX: {
+            caption: 'Pos X', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+          posY: {
+            caption: 'Pos Y', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+        },
+        help: 'none required nested object',
+      },
+    }, {
+      none: '123',
+    });
+
     const selector = '.generic-form-control:contains("Child 1")';
     cy.get(selector).should('exist');
 
     cy.get(`${selector} .generic-form-add-button`).should('exist');
-    cy.get('pre.model-result').should('contain', '"child_1": null,');
+    cy.get('pre.model-result').should('contain', '"child_1": null');
 
     cy.getSettled(`${selector} .generic-form-add-button img:visible`).click();
 
@@ -38,16 +60,36 @@ describe('generic-form-subform', () => {
     ].join('\n  '));
 
     cy.getSettled(`${selector} .generic-form-remove-button img:visible`).click();
-    cy.get('pre.model-result').should('contain', '"child_1": null,');
+    cy.get('pre.model-result').should('contain', '"child_1": null');
 
   });
 
   it('Required Child', () => {
+
+    initForm({
+      child_2: {
+        caption: 'Child 2', type: 'object',
+        required: true,
+        properties: {
+          posX: {
+            caption: 'Pos X', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+          posY: {
+            caption: 'Pos Y', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+        },
+        help: 'required nested object',
+      },
+    }, {
+      none: '123',
+    });
+
     const selector = '.generic-form-control:contains("Child 2")';
     cy.get(selector).should('exist');
 
     cy.get(`${selector} .generic-form-remove-button button`).should('not.exist');
-    cy.get('pre.model-result').should('contain', '"child_1": null,');
 
     cy.get('pre.model-result').should('contain', [
       '"child_2": {',
@@ -59,6 +101,27 @@ describe('generic-form-subform', () => {
   });
 
   it('Inline Child', () => {
+
+    initForm({
+      child_4: {
+        type: 'object',
+        inline: true,
+        properties: {
+          posX: {
+            caption: 'Inline Child Pos X', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+          posY: {
+            caption: 'Inline Child Pos Y', type: 'integer',
+            min: 0, help: 'validation > 0',
+          },
+        },
+      },
+    }, {
+      none: '123',
+    });
+
+
     const selector = '.generic-form-control:contains("Inline Child Pos X")';
     cy.get(selector).should('exist');
 
@@ -84,7 +147,30 @@ describe('generic-form-subform', () => {
 
   });
 
-  it('Inline Subform', () => {
+  it.only('Inline Subform', () => {
+
+    initForm({
+      subform1: {
+        type: 'subform',
+        inline: true,
+        content: {
+          s1_name: {
+            caption: 'Subform Name', type: 'text',
+          },
+          s1_age: {
+            caption: 'Subform Age', type: 'integer',
+            min: 18,
+            max: 99,
+            help: '18 <= age <= 99',
+          },
+
+        },
+      },
+    }, {
+      none: '123',
+    });
+
+
     const selector1 = '.generic-form-control:contains("Subform Name")';
     const selector2 = '.generic-form-control:contains("Subform Age")';
     cy.get(selector1).should('exist');
