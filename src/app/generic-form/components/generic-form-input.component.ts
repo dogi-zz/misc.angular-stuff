@@ -130,12 +130,12 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
 
   private isInit = false;
 
-  public widgetTemplate: TemplateRef<ElementRef>;
+  public widgetTemplate: TemplateRef<{$implicit: WidgetControl}>;
 
   public widgetControl: WidgetControl;
 
-  public addToArrayButtonTemplate: TemplateRef<ElementRef>;
-  public removeFromArrayButtonTemplate: TemplateRef<ElementRef>;
+  public addToArrayButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
+  public removeFromArrayButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
 
 
   constructor(
@@ -201,7 +201,7 @@ export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
 
     setTimeout(()=>{
       if (this.control.element.type === 'array'){
-        let buttonData : {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
+        let buttonData : {template: TemplateRef<{$implicit: ButtonControl}>, position: ButtonLayoutPosition};
         buttonData = this.genericFormComponent.resolveButton(this.control, 'AddToArray');
         this.addToArrayButtonTemplate = buttonData.template;
         buttonData = this.genericFormComponent.resolveButton(this.control, 'RemoveFromArray');

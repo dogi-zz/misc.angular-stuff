@@ -85,16 +85,16 @@ import {FormDefinition, FormModel, FormValidationResult} from './generic-form.da
 })
 export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
 
-  @ViewChild('buttonCreateObject') public buttonCreateObject: TemplateRef<ElementRef>;
-  @ViewChild('buttonRemoveObject') public buttonRemoveObject: TemplateRef<ElementRef>;
-  @ViewChild('buttonAddToArray') public buttonAddToArray: TemplateRef<ElementRef>;
-  @ViewChild('buttonRemoveFromArray') public buttonRemoveFromArray: TemplateRef<ElementRef>;
+  @ViewChild('buttonCreateObject') public buttonCreateObject: TemplateRef<{$implicit: ButtonControl}>;
+  @ViewChild('buttonRemoveObject') public buttonRemoveObject: TemplateRef<{$implicit: ButtonControl}>;
+  @ViewChild('buttonAddToArray') public buttonAddToArray: TemplateRef<{$implicit: ButtonControl}>;
+  @ViewChild('buttonRemoveFromArray') public buttonRemoveFromArray: TemplateRef<{$implicit: ButtonControl}>;
 
-  @ViewChild('inputSelect') public inputSelect: TemplateRef<ElementRef>;
-  @ViewChild('inputBoolean') public inputBoolean: TemplateRef<ElementRef>;
-  @ViewChild('inputInteger') public inputInteger: TemplateRef<ElementRef>;
-  @ViewChild('inputNumber') public inputNumber: TemplateRef<ElementRef>;
-  @ViewChild('inputText') public inputText: TemplateRef<ElementRef>;
+  @ViewChild('inputSelect') public inputSelect: TemplateRef<{$implicit: WidgetControl}>;
+  @ViewChild('inputBoolean') public inputBoolean: TemplateRef<{$implicit: WidgetControl}>;
+  @ViewChild('inputInteger') public inputInteger: TemplateRef<{$implicit: WidgetControl}>;
+  @ViewChild('inputNumber') public inputNumber: TemplateRef<{$implicit: WidgetControl}>;
+  @ViewChild('inputText') public inputText: TemplateRef<{$implicit: WidgetControl}>;
 
 
   @Input()
@@ -104,10 +104,10 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   public model: FormModel;
 
   @Input()
-  public getWidget: (control: ControlDef) => TemplateRef<ElementRef>;
+  public getWidget: (control: ControlDef) => TemplateRef<{$implicit: WidgetControl}>;
 
   @Input()
-  public getButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
+  public getButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<{$implicit: ButtonControl}>, position: ButtonLayoutPosition};
 
   @Input()
   public getElementLayout: (control: ControlDef, isEmpty: boolean) => TemplateRef<ElementLayout>;
@@ -136,8 +136,8 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   private errorsSubscription: Subscription;
 
   public resolveElementLayout: (control: ControlDef, isEmpty: boolean) => ElementLayout;
-  public resolveWidget: (control: ControlDef) => TemplateRef<ElementRef>;
-  public resolveButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition};
+  public resolveWidget: (control: ControlDef) => TemplateRef<{$implicit: WidgetControl}>;
+  public resolveButton: (control: ControlDef, type: ButtonType) => {template: TemplateRef<{$implicit: ButtonControl}>, position: ButtonLayoutPosition};
 
   constructor() {
   }
@@ -237,7 +237,7 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
     this.formInstance.setModel(workingModel);
   }
 
-  private getDefaultWidget(control: ControlDef): TemplateRef<ElementRef> {
+  private getDefaultWidget(control: ControlDef): TemplateRef<{$implicit: WidgetControl}> {
     if (control.element.type === 'selection') {
       return this.inputSelect;
     }
@@ -256,7 +256,7 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
     return null;
   }
 
-  private getDefaultButton(control: ControlDef, type: ButtonType): {template: TemplateRef<ElementRef>, position: ButtonLayoutPosition} {
+  private getDefaultButton(control: ControlDef, type: ButtonType): {template: TemplateRef<{$implicit: ButtonControl}>, position: ButtonLayoutPosition} {
     if (type === 'CreateObject') {
       return {position: 'BeforeInput', template: this.buttonCreateObject};
     }

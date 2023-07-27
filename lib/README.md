@@ -26,13 +26,13 @@ Features:
 
 ## Split bar
 
-<a href="https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar" target="_blank">See in Action</a>
+[See in Action](https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar){:target="_blank"}
 
 For resizing issues (e.g. table columns) a simple bar, that can be moved (in a position:relative/absolute environment), and fires events when the user does so.
 
 ## Info Panel
 
-<a href="https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar" target="_blank">See in Action</a>
+[See in Action](https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar){:target="_blank"}
 
 When you want to show infos on a position:relative/absolute environment, that possibly covers something, and want it to move when the mouse comes in.
 

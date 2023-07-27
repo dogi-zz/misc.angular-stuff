@@ -48,16 +48,16 @@ export class GenericFormButtonComponent implements OnInit, OnChanges {
 
   public visible: Observable<boolean>;
 
-  public addObjectButtonTemplate: TemplateRef<ElementRef>;
+  public addObjectButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
   public addObjectButtonControl: ButtonControl;
 
-  public addArrayButtonTemplate: TemplateRef<ElementRef>;
+  public addArrayButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
   public addArrayButtonControl: ButtonControl;
 
-  public removeObjectButtonTemplate: TemplateRef<ElementRef>;
+  public removeObjectButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
   public removeObjectButtonControl: ButtonControl;
 
-  public removeArrayButtonTemplate: TemplateRef<ElementRef>;
+  public removeArrayButtonTemplate: TemplateRef<{$implicit: ButtonControl}>;
   public removeArrayButtonControl: ButtonControl;
 
   constructor(
