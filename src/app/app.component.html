@@ -1,19 +1,17 @@
-
-<div class="angular-stuff-menu">
-  <div class="btn b1" (click)="showGenericForm()">
-    <span>Generic Form</span>
+<div class="main-menu">
+  <div class="menu-item" [class.active]="showPage === 'form'" (click)="router.navigate(['/form'])">
+    <span>Form</span>
   </div>
-  <div class="btn b1" (click)="showSplitBar()">
-    <span>Split Bar / Info Panel</span>
+  <div class="menu-item" [class.active]="showPage === 'panel'" (click)="router.navigate(['/panel'])">
+    <span>Panel</span>
   </div>
-  <div class="btn b1" (click)="showSvgTools()">
-    <span>SVG-Path Tools</span>
+  <div class="menu-item" [class.active]="showPage === 'svg'" (click)="router.navigate(['/svg'])">
+    <span>SVG-Path</span>
   </div>
 </div>
 
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>
 
-<generic-form-showcase *ngIf="showPage === 'form'"></generic-form-showcase>
 
-<bar-and-panel-showcase *ngIf="showPage === 'split_bar'"></bar-and-panel-showcase>
-
-<svg-path-showcase *ngIf="showPage === 'svg_tools'"></svg-path-showcase>

@@ -1,12 +1,144 @@
 import {Component, OnInit} from '@angular/core';
-import {getPontDistance, SvgPath, SvgPathCurvedSegment, SvgPathCurveSegmentImpl, SvgPathLineSegmentImpl, SvgPathSegmentImpl, SvgPathTools} from '../tools/svg-path-tools';
+import {SvgPath, SvgPathCurveSegmentImpl, SvgPathLineSegmentImpl, SvgPathSegmentImpl, SvgPathTools} from '../tools/svg-path-tools';
 
 const printNum = (num: number) => (Math.round(num * 100) / 100).toFixed(2);
 
 @Component({
   selector: 'svg-path-showcase',
-  templateUrl: './svg-path-showcase.component.html',
-  styleUrls: ['./svg-path-showcase.component.scss'],
+  template: `
+    <h1>SVG-Path Tools</h1>
+
+    <div class="show-panel">
+
+      <div class="showcaseTile wide">
+        <h2>Find Point On Path</h2>
+
+        <div class="imageWrapper">
+          <slider [value]="pointOnPathValue" (valueChange)="setSliderValue('pointOnPathValue', $event)"
+                  [color]="sliderColor"></slider>
+
+          <div class="imageWrapperContent">
+            <div class="main">
+              <div class="vSlider">
+                <slider [value]="pointOnPathCp.y1" (valueChange)="setSliderSubValue('pointOnPathCp','y1', $event)"
+                        [color]="sliderColor" [orientation]="'vertical'" [size]="'medium'"></slider>
+              </div>
+              <div class="image">
+                <svg height="200" width="400">
+                  <path [attr.d]="pointOnPathPathString" stroke="green" stroke-width="3" fill="none"/>
+                  <path *ngFor="let line of pointOnPathLines" [attr.d]="line" stroke="gray" stroke-width="1"/>
+                  <circle [attr.cx]="pointOnPathPathMarker?.[0]" [attr.cy]="pointOnPathPathMarker?.[1]" r="5"
+                          fill="green"></circle>
+                </svg>
+              </div>
+              <div class="vSlider">
+                <slider [value]="pointOnPathCp.y2" (valueChange)="setSliderSubValue('pointOnPathCp','y2', $event)"
+                        [color]="sliderColor" [orientation]="'vertical'" [size]="'medium'"></slider>
+              </div>
+            </div>
+            <div class="hSliders withV">
+              <div class="hSlider">
+                <slider [value]="pointOnPathCp.x1" (valueChange)="setSliderSubValue('pointOnPathCp','x1', $event)"
+                        [color]="sliderColor" [size]="'medium'"></slider>
+                <div class="description">{{ pointOnPathCp1String }}</div>
+              </div>
+              <div class="hSlider">
+                <slider [value]="pointOnPathCp.x2" (valueChange)="setSliderSubValue('pointOnPathCp','x2', $event)"
+                        [color]="sliderColor" [size]="'medium'"></slider>
+                <div class="description">{{ pointOnPathCp2String }}</div>
+              </div>
+            </div>
+            <div class="description">
+              Path Length {{ pointOnPathLen }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="showcaseTile">
+        <h2>Split Path</h2>
+
+        <div class="imageWrapper">
+          <slider [value]="splitPathValue" (valueChange)="setSplitPathValue($event)" [color]="sliderColor" [min]="10"
+                  [max]="90"></slider>
+
+          <div class="imageWrapperContent">
+            <div class="main">
+              <div class="image">
+                <svg height="200" width="400" style="border: 1px  gray">
+                  <path [attr.d]="splitPathString1" stroke="green" stroke-width="3" fill="none"/>
+                  <path [attr.d]="splitPathString2" stroke="green" stroke-width="3" fill="none"/>
+                  <path d="M 20 180 L 100 50 Z" stroke="gray" stroke-width="1"/>
+                  <path d="M 380 180 L 200 50 Z" stroke="gray" stroke-width="1"/>
+                  <path [attr.d]="splitPathNormalLine1" stroke="gray" stroke-width="1"/>
+                  <path [attr.d]="splitPathNormalLine2" stroke="gray" stroke-width="1"/>
+                  <path *ngFor="let testPath of testPaths" [attr.d]="testPath" stroke="gray" stroke-width="1"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="description">
+            Segment1 Len {{ splitPathLen1 }}
+          </div>
+          <div class="description">
+            Segment2 Len {{ splitPathLen2 }}
+          </div>
+
+        </div>
+      </div>
+
+      <div class="showcaseTile">
+        <h2>Round Corner</h2>
+
+        <div class="imageWrapper">
+          <slider [value]="roundCornerValue" (valueChange)="setSliderValue('roundCornerValue', $event)"
+                  [color]="sliderColor"></slider>
+          <div class="imageWrapperContent">
+            <div class="main">
+              <div class="image">
+                <svg height="200" width="400" style="border: 1px  gray">
+                  <path [attr.d]="roundCornerString" stroke="green" stroke-width="3" fill="none"/>
+                  <path *ngFor="let line of roundCornerLines" [attr.d]="line" stroke="lightgray" stroke-width="1"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="showcaseTile">
+        <h2>Ring-Part</h2>
+
+        <div class="imageWrapper">
+          <slider [value]="ringPartValue" (valueChange)="setSliderValue('ringPartValue', $event)"
+                  [color]="sliderColor"></slider>
+          <div class="imageWrapperContent">
+            <div class="main">
+              <div class="image">
+                <svg height="200" width="400" style="border: 1px  gray">
+                  <path [attr.d]="ringPartString" stroke="green" stroke-width="3" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="hSliders">
+              <div class="hSlider">
+                <slider [value]="ringPartBorderValue" (valueChange)="setSliderValue('ringPartBorderValue', $event)"
+                        [color]="sliderColor" [size]="'medium'"></slider>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `,
+  styleUrls: [
+    './svg-path-showcase.component.less',
+  ],
 })
 export class SvgPathShowcaseComponent implements OnInit {
 
@@ -144,7 +276,7 @@ export class SvgPathShowcaseComponent implements OnInit {
     // RingPart
 
 
-    const ringInfo = SvgPathTools.getRingPart((this.ringPartValue / 100 * 350 + 5) / 360 * Math.PI * 2, [200, 100], 80, 40, this.ringPartBorderValue / 5 );
+    const ringInfo = SvgPathTools.getRingPart((this.ringPartValue / 100 * 350 + 5) / 360 * Math.PI * 2, [200, 100], 80, 40, this.ringPartBorderValue / 5);
     const ringPath: SvgPath = {
       segments: ringInfo.segments,
     };

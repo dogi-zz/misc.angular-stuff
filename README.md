@@ -1,5 +1,8 @@
 # MiscAngularStuff
 
+**Version 2.0**
+
+
 ## Generic Form
 
 <a href="https://dogi-zz.github.io/misc.angular-stuff/?page=form" target="_blank">See in Action</a>

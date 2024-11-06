@@ -1,0 +1,9 @@
+[submodule "libs/ace-editor"]
+	path = libs/ace-editor
+	url = https://github.com/ajaxorg/ace-builds.git
+[submodule "libs/json-parser"]
+	path = libs/json-parser
+	url = https://github.com/dogi-zz/node.json-parser.git
+[submodule "libs/generic-form"]
+	path = libs/generic-form
+	url = https://github.com/dogi-zz/angular-generic-form.git

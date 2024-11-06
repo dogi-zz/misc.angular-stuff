@@ -1,58 +1,109 @@
-import {FormDefinition} from '../generic-form/generic-form.data';
-
+import {FormDefinition} from '../../../libs/generic-form/generic-form-definition';
 
 export const formDef5: FormDefinition = {
-  name: {
-    caption: 'Name', type: 'text',
-  },
-  child_count: {
-    caption: 'Child Count', type: 'integer',
-    min: 0, max: 5,
-  },
-  children: {
-    caption: 'Children', type: 'array',
-    condition: {path: 'child_count', condition: 'eq', value: 1},
-    required: true, minLength: 1, maxLength: 1,
-    elements: {
-      type: 'object',
-      required: true,
-      properties: {
-        name: {caption: 'Name', type: 'text', required: true},
-        age: {caption: 'Age', type: 'integer', required: true},
+  child_1: {
+    caption: 'Child', type: 'object',
+    help: 'none required object',
+    validate: null,
+    properties: {
+      name: {
+        caption: 'Name', type: 'text',
+        validate: null,
+        help: 'required string array',
+      },
+      inner_child: {
+        caption: 'Inner Child', type: 'object',
+        help: 'none required object',
+        validate: null,
+        properties: {
+          posX: {
+            caption: 'Pos X', type: 'integer',
+            validate: null,
+          },
+          posY: {
+            caption: 'Pos Y', type: 'integer',
+            validate: null,
+          },
+        },
       },
     },
   },
-  childrenNames: {
-    caption: 'Children Names', type: 'array',
-    condition: {path: 'child_count', condition: 'eq', value: 2},
-    required: true,  minLength: 2, maxLength: 2,
+  string_array: {
+    validate: null,
+    caption: 'String Array', type: 'array',
     elements: {
       type: 'text',
-      required: true,
+      validate: null,
     },
+    help: 'none required string array',
   },
-  showSubform: {
-    caption: 'Show Subform', type: 'boolean', required: true,
-  },
-  subForm : {
-    type: 'subform',
-    inline: true,
-    condition: {path: 'showSubform', condition: 'eq', value: true},
-    content: {
-      employed: {
-        caption: 'Employed', type: 'boolean', required: true,
-      },
-      jobName: {
-        condition: {path: 'employed', condition: 'eq', value: true},
-        caption: 'Job Name', type: 'text', required: true,
+  object_array: {
+    caption: 'Object Array', type: 'array',
+    validate: null,
+    elements: {
+      type: 'object',
+      validate: null,
+      properties: {
+        num: {
+          caption: 'Some Number', type: 'number',
+          validate: null,
+        },
+        bool: {
+          caption: 'Some Bool', type: 'boolean',
+          validate: null,
+        },
       },
     },
+    help: 'none required object array',
   },
+
+
 };
 
+export const  validationFunctions5: { path: string, functionString: string, time?: number }[] = [
+  {path: 'child_1', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'child_1.inner_child', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'child_1.inner_child.posX', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'child_1.inner_child.posY', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'child_1.name', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'string_array', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'object_array', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'object_array.#', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'object_array.#.bool', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'object_array.#.num', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'string_array', functionString: '// console.info(value, parent, inspector);' },
+  {path: 'string_array.#', functionString: '// console.info(value, parent, inspector);' },
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const model5: any = {
-  name: 'foo',
-  showSubform: false,
+  child_1: {
+    name: 'Some Name',
+    inner_child: {
+      posX: 12,
+      posY: 23,
+    },
+  },
+  string_array: [
+    'foo',
+    'bar',
+  ],
+  object_array: [
+    {num: 0, bool: true},
+    {num: 1, bool: false},
+  ],
 };
 
 

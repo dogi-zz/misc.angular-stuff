@@ -1,0 +1,82 @@
+@transition-color-time: 0.3s;
+
+@active-color: #312450;
+@active-color-light: #805bd7;
+
+@active-gray-1: #515C66;
+@light-gray: #D7D8D9;
+
+@button-border-radius: 4px;
+@button-font-size: 15px;
+@button-padding: 10px 15px;
+@button-background-inactive: #fafbfd;
+@button-background-hover: #ded7ef;
+@button-color-hover: @active-color;
+@button-background-active: @active-color-light;
+
+
+.multi-assign(@prop, @opts) {
+  each(@opts, {
+    @{key} {
+        @{prop}: @value;
+    }
+  });
+}
+
+.flex-centering() {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-style-active(@activeClass) {
+  &:hover {
+    background: @button-background-hover;
+  }
+  &@{activeClass} {
+    color: white;
+    background: @button-background-active;
+  }
+}
+
+
+.button-style() {
+  .flex-centering();
+  background: @button-background-inactive;
+  border-radius: @button-border-radius;
+  border: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 10px 15px;
+  text-decoration: none;
+  letter-spacing: 2px;
+  font-size: @button-font-size;
+  color: @button-color-hover;
+  font-weight: normal;
+}
+
+
+.panel-style() {
+  margin: 10px 0;
+  border: 1px solid #ded7ef;
+  background: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  h1, h2, h3, h4, h5, h6 {
+    color: @active-color-light;
+  }
+}
+
+
+.animate-color(@normal, @hover, @active) {
+  color: #6b708d;
+  transition: color @transition-color-time;
+
+  &:hover {
+    color: @hover;
+  }
+  &.active {
+    color: white;
+  }
+}

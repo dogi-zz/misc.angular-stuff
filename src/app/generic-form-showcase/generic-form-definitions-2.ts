@@ -1,11 +1,9 @@
-import {FormDefinition} from '../generic-form/generic-form.data';
+import {FormDefinition} from '../../../libs/generic-form/generic-form-definition';
 
 export const formDef2: FormDefinition = {
-  name_1: {
-    caption: 'Name 1', type: 'text',
-  },
   child_1: {
     caption: 'Child 1', type: 'object',
+    help: 'none required object',
     properties: {
       posX: {
         caption: 'Pos X', type: 'integer',
@@ -16,10 +14,10 @@ export const formDef2: FormDefinition = {
         min: 0, help: 'validation > 0',
       },
     },
-    help: 'none required nested object',
   },
   child_2: {
     caption: 'Child 2', type: 'object',
+    help: 'required object',
     required: true,
     properties: {
       posX: {
@@ -31,10 +29,10 @@ export const formDef2: FormDefinition = {
         min: 0, help: 'validation > 0',
       },
     },
-    help: 'required nested object',
   },
   child_3: {
     caption: 'Child 3', type: 'object',
+    help: 'none required nested object with init value',
     required: false,
     properties: {
       posX: {
@@ -50,7 +48,6 @@ export const formDef2: FormDefinition = {
         layout: 'wide',
       },
     },
-    help: 'none required nested object with init value',
   },
   child_4: {
     type: 'object',
@@ -67,22 +64,6 @@ export const formDef2: FormDefinition = {
     },
   },
 
-  subform1: {
-    type: 'subform',
-    inline: true,
-    content: {
-      s1_name: {
-        caption: 'Subform Name', type: 'text',
-      },
-      s1_age: {
-        caption: 'Subform Age', type: 'integer',
-        min: 18,
-        max: 99,
-        help: '18 <= age <= 99',
-      },
-
-    },
-  },
 
 };
 

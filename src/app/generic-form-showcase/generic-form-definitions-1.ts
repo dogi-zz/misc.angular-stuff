@@ -1,4 +1,4 @@
-import {FormDefinition} from '../generic-form/generic-form.data';
+import {FormDefinition} from '../../../libs/generic-form/generic-form-definition';
 
 export const formDef1: FormDefinition = {
   name_1: {
@@ -54,61 +54,61 @@ export const formDef1: FormDefinition = {
   bool_2: {
     caption: 'Boolean 2', type: 'boolean', required: true,
   },
-  child_1: {
-    caption: 'Child 1', type: 'object',
-    properties: {
-      posX: {
-        caption: 'Pos X', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-      posY: {
-        caption: 'Pos Y', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-    },
-    help: 'none required nested object',
-  },
-  child_2: {
-    caption: 'Child 2', type: 'object',
-    required: false,
-    properties: {
-      posX: {
-        caption: 'Pos X', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-      posY: {
-        caption: 'Pos Y', type: 'integer',
-        min: 0, help: 'validation > 0',
-      },
-    },
-    help: 'none required nested object with init value',
-  },
-  array_1: {
-    caption: 'Array 1', type: 'array',
-    required: true,
-    elements: {
-      type: 'text',
-    },
-  },
-  array_2: {
-    caption: 'Array 2', type: 'array',
-    help: 'Optional array',
-    elements: {
-      type: 'text',
-    },
-  },
-  array_3: {
-    caption: 'Array 3', type: 'array',
-    help: 'Array with min 2 and max 4',
-    required: true,
-    elements: {
-      type: 'text',
-      layout: 'wide',
-      required: true,
-    },
-    minLength: 3,
-    maxLength: 4,
-  },
+  // child_1: {
+  //   caption: 'Child 1', type: 'object',
+  //   properties: {
+  //     posX: {
+  //       caption: 'Pos X', type: 'integer',
+  //       min: 0, help: 'validation > 0',
+  //     },
+  //     posY: {
+  //       caption: 'Pos Y', type: 'integer',
+  //       min: 0, help: 'validation > 0',
+  //     },
+  //   },
+  //   help: 'none required nested object',
+  // },
+  // child_2: {
+  //   caption: 'Child 2', type: 'object',
+  //   required: false,
+  //   properties: {
+  //     posX: {
+  //       caption: 'Pos X', type: 'integer',
+  //       min: 0, help: 'validation > 0',
+  //     },
+  //     posY: {
+  //       caption: 'Pos Y', type: 'integer',
+  //       min: 0, help: 'validation > 0',
+  //     },
+  //   },
+  //   help: 'none required nested object with init value',
+  // },
+  // array_1: {
+  //   caption: 'Array 1', type: 'array',
+  //   required: true,
+  //   elements: {
+  //     type: 'text',
+  //   },
+  // },
+  // array_2: {
+  //   caption: 'Array 2', type: 'array',
+  //   help: 'Optional array',
+  //   elements: {
+  //     type: 'text',
+  //   },
+  // },
+  // array_3: {
+  //   caption: 'Array 3', type: 'array',
+  //   help: 'Array with min 2 and max 4',
+  //   required: true,
+  //   elements: {
+  //     type: 'text',
+  //     layout: 'wide',
+  //     required: true,
+  //   },
+  //   minLength: 3,
+  //   maxLength: 4,
+  // },
 };
 
 

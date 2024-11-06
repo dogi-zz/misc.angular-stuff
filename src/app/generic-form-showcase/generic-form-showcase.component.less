@@ -1,0 +1,158 @@
+@import (reference) "../../styles/includes";
+@import (reference) "../../styles/pretty-json";
+
+@import "../../../libs/generic-form/style/generic-form";
+
+.text-input-base() {
+  font-size: 14px;
+  color: #515C66;
+  padding: 6px 7px;
+  width: 200px;
+  background: #FDFEFF;
+  border: 1px solid #D7D8D9;
+  border-radius: 3px;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.generic-form-showcase {
+  margin: 20px 0;
+
+  .form-panel {
+    width: 100%;
+
+    .toggle-button {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin: 5px 0;
+
+      .error {
+        background-color: rgb(236, 171, 171); /* Leicht transparentes Rot */
+        padding: 5px 10px;
+        color: #ff0000;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
+
+  .output-panel {
+    .panel-style();
+    position: absolute;
+    top: 160px;
+    right: 0;
+
+    pre {
+      .pretty-json();
+    }
+
+  }
+
+  .option-panel {
+    .panel-style();
+    margin-top: 0;
+    box-sizing: border-box;
+
+    .option-path {
+      font-weight: bold;
+      color: @active-color;
+    }
+
+    .option-value {
+      margin-left: 40px;
+      font-family: monospace;
+      white-space: nowrap;
+      font-size: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+
+      margin-top: 5px;
+      border: 1px solid @light-gray;
+      padding: 2px 5px;
+
+      &:hover {
+        background: @light-gray;
+      }
+    }
+  }
+
+  .validation-panel {
+    .panel-style();
+
+    .function-path {
+      font-weight: bold;
+      color: @active-color;
+    }
+
+    .function-value {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+
+      div.code{
+        flex: 1;
+      }
+      div.timeout{
+        width: 80px;
+      }
+      input[type=text] {
+        .text-input-base();
+        font-family: monospace;
+        width: calc(100% - 20px);
+      }
+
+      input[type=number] {
+        .text-input-base();
+        width: calc(100% - 20px);
+      }
+
+      label {
+        color: @active-gray-1;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .input-section {
+    margin-bottom: 10px;
+
+    input {
+      .text-input-base();
+    }
+
+    .option-panel {
+      .option-set {
+        margin-top: 10px;
+
+        > div {
+          display: flex;
+          margin-bottom: 5px;
+
+          .label {
+            color: @active-gray-1;
+            width: 70px;
+          }
+
+          .value {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+  }
+
+
+  .generic-form {
+    .generic-form();
+  }
+}
+
+.generic-form-panel() {
+  .panel-style();
+}
+

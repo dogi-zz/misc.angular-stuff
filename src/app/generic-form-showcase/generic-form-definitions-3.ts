@@ -1,9 +1,6 @@
-import {FormDefinition} from '../generic-form/generic-form.data';
+import {FormDefinition} from '../../../libs/generic-form/generic-form-definition';
 
 export const formDef3: FormDefinition = {
-  name_1: {
-    caption: 'Name 1', type: 'text',
-  },
   strings_1: {
     caption: 'Strings 1', type: 'array',
     required: true,
@@ -15,7 +12,7 @@ export const formDef3: FormDefinition = {
   strings_2: {
     caption: 'Strings 2', type: 'array',
     elements: {
-      type: 'text'
+      type: 'text',
     },
     minLength: 3,
     maxLength: 4,
@@ -32,6 +29,16 @@ export const formDef3: FormDefinition = {
     maxLength: 4,
     help: 'wide strings',
   },
+  strings_4: {
+    caption: 'Strings 4', type: 'array',
+    elements: {
+      type: 'text',
+      layout: 'wide',
+      required: true,
+    },
+    minLength: 2,
+    help: 'non required strings but min length',
+  },
   objects_1: {
     caption: 'Objects 1', type: 'array',
     help: 'Array of Required objects',
@@ -41,12 +48,12 @@ export const formDef3: FormDefinition = {
       properties: {
         posX: {
           required: true,
-          caption: 'Inline Child Pos X', type: 'integer',
+          caption: 'Child Pos X', type: 'integer',
           min: 0, help: 'validation > 0',
         },
         posY: {
           required: true,
-          caption: 'Inline Child Pos Y', type: 'integer',
+          caption: 'Child Pos Y', type: 'integer',
           min: 0, help: 'validation > 0',
         },
       },
@@ -89,8 +96,6 @@ export const formDef3: FormDefinition = {
 
 
 export const model3: any = {
-  extraData: 'foo',
-  name_1: 'Some Arrays',
   strings_2: ['element 1', null],
   strings_3: ['wide element 1', 'wide element 2'],
   objects_1: [{posX: 1}],

@@ -1,5 +1,8 @@
 {
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "parserOptions": {
     "ecmaVersion": 2017,
     "sourceType": "module",
@@ -7,7 +10,9 @@
       "jsx": true
     }
   },
-  "ignorePatterns": ["**/*.test.html"],
+  "ignorePatterns": [
+    "**/*.test.html"
+  ],
   "env": {
     "browser": false,
     "node": true,
@@ -24,11 +29,31 @@
     "expect": "readonly"
   },
   "rules": {
-    "no-sequences": "error",
-    "no-regex-spaces": "warn",
-    "semi": "warn",
-    "quotes": [1, "single", { "avoidEscape": true }],
-    "prefer-const": "warn",
-    "no-unused-vars": "warn"
+    //    "no-sequences": "error",
+    //    "no-regex-spaces": "warn",
+    //    "semi": "warn",
+    //    "quotes": [1, "single", { "avoidEscape": true }],
+    //    "prefer-const": "warn",
+    //    "no-unused-vars": "warn"
+    "@typescript-eslint/adjacent-overload-signatures": "error",
+    "@typescript-eslint/explicit-member-accessibility": ["error", {"accessibility": "explicit"}],
+    "@typescript-eslint/array-type": ["error", {"default": "array"}],
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "max-len": ["error", {"code": 240}],
+    "no-console": "warn",
+    "prefer-template": "warn",
+    "semi": ["error", "always"],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "always-multiline"
+      }
+    ]
   }
 }

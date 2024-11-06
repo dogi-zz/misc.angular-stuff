@@ -157,7 +157,7 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
           this.newPosition.emit({left, right});
         }
 
-        if (left > 0) {
+        if (right < 0) {
           if (!outsideRightInterval) {
             this.exitRight.emit();
             outsideRightInterval = setInterval(() => this.outsideRight.emit(), this.outsideIntervalTime);
@@ -180,6 +180,8 @@ export class SplitBarComponent implements OnInit, OnChanges, AfterViewInit {
     bar.ondragend = (event) => {
       clearInterval(outsideRightInterval);
       clearInterval(outsideLeftInterval);
+      outsideRightInterval = null;
+      outsideLeftInterval = null;
       event.preventDefault();
       event.stopImmediatePropagation();
       this.checkPosition();
