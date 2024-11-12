@@ -1,0 +1,227 @@
+@generic-form-color-text: #515C66;
+@generic-form-color-error: #d52c2c;
+@generic-form-color-error-caption: #e79292;
+@generic-form-color-error-border: #e79292;
+
+
+@generic-form-input-text-width: 200px;
+@generic-form-input-number-width: 100px;
+
+@generic-form-input-color: @generic-form-color-text;
+@generic-form-input-border: 1px solid #D7D8D9;
+@generic-form-input-border-color: 1px solid #ced4da;
+@generic-form-input-border-radius: 3px;
+
+@generic-form-boolean-active-color: #1876d1;
+@generic-form-boolean-inactive-color: #e1e1e1;
+@generic-form-boolean-width: 60px;
+@generic-form-boolean-height: 30px;
+@generic-form-boolean-padding: 3px;
+
+@generic-form-array-border: 1px solid #eeeeee;
+@generic-form-array-add-background: rgba(24, 118, 209, 0.02);
+
+@generic-form-color-caption: @generic-form-color-text;
+
+@generic-form-select-border: @generic-form-input-border;
+@generic-form-select-border-radius: @generic-form-input-border-radius;
+@generic-form-select-hover-bg: #fafafa;
+@generic-form-select-box-shadow:  0 2px 6px 0 rgb(0 0 0 / 20%);
+@generic-form-select-height:  100px;
+@generic-form-select-font-size: 14px;
+@generic-form-select-color: @generic-form-input-color;
+@generic-form-select-color-selected: #7b8a96;
+@generic-form-select-color-no-option:#adadad;
+
+/**************************/
+/** ... BASIC-STYLES ... **/
+/**************************/
+
+
+.generic-form-button() {
+  border: none;
+  color: #fafafa;
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.generic-form-error(){
+  font-size: 10px;
+  color: @generic-form-color-error;
+}
+
+.generic-form-title(){
+  font-size: 14px;
+  color: @generic-form-color-caption;
+  white-space: nowrap;
+  margin-right: 7px;
+
+}
+
+
+/********************/
+/** ... PANELS ... **/
+/********************/
+
+
+.generic-form-panel() {
+  background: #FDFEFF;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 12%);
+  border-radius: 5px;
+
+  > .generic-form-caption {
+    margin-bottom: 10px;
+    margin-right: 25px;
+
+    .generic-form-title {
+      font-weight: bold;
+    }
+  }
+
+  &.hovered_add {
+    .generic-form-title {
+      color: @generic-form-boolean-active-color;
+    }
+  }
+
+  &.hovered_delete {
+    opacity: 0.5;
+  }
+}
+
+.generic-form-panel-error() {
+  border-color: @generic-form-color-error-border;
+  box-shadow: 0 2px 8px 0 rgb(128 0 0 / 50%);
+}
+
+.generic-form-error-caption() {
+  .generic-form-title {
+    color: @generic-form-color-error;
+  }
+  .generic-form-help {
+    color: @generic-form-color-error-caption;
+  }
+}
+
+
+/************************/
+/** ... INPUT TEXT ... **/
+/************************/
+
+
+.generic-form-input-text-base() {
+  appearance: none;
+  box-sizing: border-box;
+
+  font-size: 14px;
+  color: @generic-form-input-color;
+  padding: 6px 7px;
+}
+
+.generic-form-input-text-border-base(@width) {
+  width: @width;
+  background: #FDFEFF;
+  border: @generic-form-input-border;
+  border-radius: @generic-form-input-border-radius;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.generic-form-input-text-focus() {
+  outline: none;
+  background: #fafafa;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 6%);
+}
+
+.generic-form-input-text-error() {
+  border-color: @generic-form-color-error-border;
+  box-shadow: 0 1px 5px @generic-form-color-error-border;
+}
+
+
+/**************************/
+/** ... NORMAL INPUT ... **/
+/**************************/
+
+
+.generic-form-input(@width) {
+  input {
+    .generic-form-input-text-base();
+    .generic-form-input-text-border-base(@width);
+
+
+    &:focus-visible {
+      .generic-form-input-text-focus();
+    }
+  }
+
+  &.generic-form-error {
+    input {
+      .generic-form-input-text-error();
+    }
+  }
+}
+
+/***************************/
+/** ... WRAPPED INPUT ... **/
+/***************************/
+
+
+.generic-form-wrapped-input(@width, @button-style) {
+
+  div.input-wrapper {
+    .generic-form-input-text-border-base(@width);
+    padding: 0;
+
+    display: flex;
+    box-sizing: border-box;
+
+    input {
+      .generic-form-input-text-base();
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      border: none;
+
+      &:focus-visible {
+        .generic-form-input-text-focus();
+      }
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      color: @generic-form-input-color;
+      background: white;
+      border: none;
+    }
+
+  }
+
+  &.generic-form-error {
+    div.input-wrapper {
+      .generic-form-input-text-error();
+    }
+  }
+
+  button {
+    @button-style();
+
+    &:nth-child(1) {
+      &::before {
+        content: "▲";
+      }
+    }
+
+    &:nth-child(2) {
+      &::before {
+        content: "▼";
+      }
+    }
+  }
+}

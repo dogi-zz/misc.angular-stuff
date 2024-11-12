@@ -1,0 +1,155 @@
+@import "generic-form-general";
+
+/******************/
+/** ... TEXT ... **/
+/******************/
+
+.generic-form-input-control() {
+  .generic-form-input(@generic-form-input-text-width);
+  &.generic-form-style-wide {
+    flex: 1;
+
+    .generic-form-input-div {
+      flex: 1;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+/********************/
+/** ... NUMBER ... **/
+/********************/
+
+.generic-form-input-number-control {
+  .generic-form-input(@generic-form-input-number-width);
+}
+
+
+/*********************/
+/** ... INTEGER ... **/
+/*********************/
+
+
+.generic-form-input-integer-control {
+  .generic-form-wrapped-input(@generic-form-input-number-width, {
+    font-size: 10px;
+    padding: 0 4px;
+    height: 50%;
+  });
+
+  button:nth-child(1)::before {
+    content: "▲";
+  }
+
+  button:nth-child(2)::before {
+    content: "▼";
+  }
+
+}
+
+/***********************/
+/** ... SELECTION ... **/
+/***********************/
+
+.generic-form-input-selection-control {
+  .generic-form-wrapped-input(@generic-form-input-text-width, {
+    font-size: 13px;
+    height: 100%;
+  });
+
+  button:nth-child(1)::before {
+    content: "▼";
+  }
+
+  .generic-form-input {
+
+    .generic-form-input-select-options {
+
+      background: #ffffff;
+      border: @generic-form-select-border;
+      border-radius: @generic-form-select-border-radius;
+      min-width: @generic-form-input-text-width;
+      z-index: 1000;
+
+      box-shadow: @generic-form-select-box-shadow;
+
+      max-height: @generic-form-select-height;
+      overflow-x: auto;
+
+      .generic-form-input-select-option {
+        font-size: @generic-form-select-font-size;
+        color: @generic-form-select-color;
+        padding: 4px 12px;
+        cursor: pointer;
+
+        &.selected {
+          color: @generic-form-select-color-selected;
+        }
+
+        &:hover, &.hovered {
+          background: @generic-form-select-hover-bg;
+        }
+
+        &.no-option {
+          color: @generic-form-select-color-no-option;
+          font-style: italic;
+          text-align: center;
+          cursor: default;
+
+          &:hover {
+            background: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+.generic-form-input-boolean-control {
+  .generic-form-input {
+    div {
+      cursor: pointer;
+      display: block;
+      width: @generic-form-boolean-width;
+      height: @generic-form-boolean-height;
+      border-radius: calc(@generic-form-boolean-height / 2);
+      padding: @generic-form-boolean-padding;
+      box-sizing: border-box;
+      background: @generic-form-boolean-inactive-color;
+
+      transition-property: background-color;
+      transition-duration: 0.2s;
+
+      div {
+        background: @generic-form-boolean-inactive-color;
+        width: calc(@generic-form-boolean-height - @generic-form-boolean-padding * 2);
+        height: calc(@generic-form-boolean-height - @generic-form-boolean-padding * 2);
+        margin-left: 1px;
+        transition-property: margin-left, background-color;
+        transition-duration: 0.2s;
+      }
+
+      &.isTrue {
+        background: @generic-form-boolean-active-color;
+
+        div {
+          margin-left: calc(@generic-form-boolean-width - @generic-form-boolean-height - 1px);
+          background: white;
+        }
+      }
+
+      &.isFalse {
+        background: @generic-form-boolean-inactive-color;
+
+        div {
+          margin-left: 1px;
+          background: white;
+        }
+      }
+    }
+  }
+}
+

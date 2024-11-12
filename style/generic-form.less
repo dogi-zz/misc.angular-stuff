@@ -1,0 +1,242 @@
+@import "generic-form-general";
+@import "generic-form-primitive";
+
+
+.generic-form() {
+
+  font-family: "Open Sans", sans-serif;
+  .generic-form-panel();
+
+  generic-form-ui-element, generic-form-input-object, generic-form-input-array {
+    display: contents;
+  }
+
+  .generic-form-control {
+    margin-bottom: 15px;
+  }
+
+
+  .generic-form-error-message {
+    .generic-form-error();
+  }
+
+  .generic-form-caption {
+    display: flex;
+    align-items: end;
+    margin-bottom: 1px;
+    width: 100%;
+
+    .generic-form-title {
+      .generic-form-title()
+    }
+    &:not(:has(.generic-form-help)){
+      .generic-form-title {
+        flex: 1;
+      }
+    }
+
+    &.generic-form-error .generic-form-title {
+      color: @generic-form-color-error;
+    }
+
+
+    .generic-form-help {
+      font-size: 10px;
+      color: #8a9fad;
+      flex: 1;
+
+      margin-right: 7px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+  }
+
+  .generic-form-input {
+    &:has(> .generic-form-caption):has(> .generic-form-button) {
+      display: grid;
+      grid-template-columns: 1fr min-content;
+
+      > .generic-form-caption {
+        grid-column: 1/2;
+      }
+
+      > .generic-form-button {
+        grid-column: 2/3;
+      }
+
+      > .generic-form-input-array-item {
+        grid-column: 1/3;
+      }
+    }
+  }
+
+  .generic-form-input-object.empty {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .generic-form-add-button {
+      margin-left: 20px;
+    }
+  }
+
+  .generic-form-control.generic-form-error > generic-form-input-object > .generic-form-input-object.empty {
+    .generic-form-caption {
+      .generic-form-error-caption();
+    }
+  }
+
+  .generic-form-input-object:not(.empty) {
+    .generic-form-panel();
+
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas: "C R" "F F";
+
+    > .generic-form-caption {
+      grid-area: C;
+      margin-bottom: 20px;
+    }
+
+    > .generic-form-remove-button {
+      grid-area: R;
+      margin-left: 10px;
+    }
+
+    > .generic-form-form {
+      grid-area: F;
+    }
+  }
+  .generic-form-control.generic-form-error > generic-form-input-object > .generic-form-input-object:not(.empty) {
+    .generic-form-panel-error()
+  }
+
+
+  .generic-form-input-array.empty {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .generic-form-add-button {
+      margin-left: 20px;
+    }
+  }
+  .generic-form-control.generic-form-error >generic-form-input-array > .generic-form-input-array.empty {
+    .generic-form-caption {
+      .generic-form-error-caption();
+    }
+  }
+
+  .generic-form-input-array:not(.empty) {
+    .generic-form-panel();
+
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas: "C R" "I I" "A A";
+
+    > .generic-form-caption {
+      grid-area: C;
+    }
+
+    &:has(.generic-form-array-content) {
+      > .generic-form-caption {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: @generic-form-array-border;
+      }
+    }
+
+
+    > .generic-form-remove-button {
+      grid-area: R;
+      padding-left: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+
+    &:has( > .generic-form-caption) {
+      > .generic-form-remove-button {
+        border-bottom: @generic-form-array-border;
+      }
+    }
+
+    > .generic-form-array-content {
+      grid-area: I;
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+    }
+
+    > .generic-form-array-add {
+      padding-top: 10px;
+      border-top: @generic-form-array-border;
+      grid-area: A;
+    }
+
+    &.hovered_add {
+      background: @generic-form-array-add-background;
+    }
+
+    .generic-form-array-content-item {
+      display: grid;
+      grid-template-columns: 1fr min-content;
+      grid-template-areas: "E R" "C R";
+
+      margin-bottom: 15px;
+
+      > .generic-form-array-content-item-child {
+        grid-area: C;
+
+        > generic-form-ui-element > .generic-form-control {
+          margin-bottom: 0;
+        }
+      }
+
+      > .generic-form-error-message {
+        text-align: right;
+        grid-area: E;
+      }
+
+      &.hovered_remove {
+        opacity: 0.5;
+      }
+
+      > generic-form-ui-element > .generic-form-control {
+        flex: 1;
+      }
+
+      > .generic-form-array-remove {
+        grid-area: R;
+        margin-left: 10px;
+      }
+    }
+
+  }
+  .generic-form-control.generic-form-error > generic-form-input-array > .generic-form-input-array:not(.empty) {
+    .generic-form-panel-error()
+  }
+
+
+  .generic-form-input-text {
+    .generic-form-input-control();
+  }
+
+  .generic-form-input-number {
+    .generic-form-input-number-control();
+  }
+  .generic-form-input-integer {
+    .generic-form-input-integer-control();
+  }
+  .generic-form-input-selection {
+    .generic-form-input-selection-control();
+  }
+  .generic-form-input-boolean {
+    .generic-form-input-boolean-control();
+  }
+
+
+}
