@@ -7,3 +7,6 @@
 [submodule "libs/generic-form"]
 	path = libs/generic-form
 	url = https://github.com/dogi-zz/angular-generic-form.git
+[submodule "libs/grid-builder"]
+	path = libs/grid-builder
+	url = https://github.com/dogi-zz/angular-grid-builder.git

@@ -9,6 +9,8 @@ import {GenericFormShowcaseComponent} from './generic-form-showcase/generic-form
 import {GenericFormShowcaseModule} from './generic-form-showcase/generic-form-showcase.module';
 import {SvgPathShowcaseComponent} from './svg-path-showcase/svg-path-showcase.component';
 import {SvgPathShowcaseModule} from './svg-path-showcase/svg-path-showcase.module';
+import {GridBuilderShowcaseModule} from "./grid-builder-showcase/grid-builder-showcase.module";
+import {GridBuilderShowcaseComponent} from "./grid-builder-showcase/grid-builder-showcase.component";
 
 @NgModule({
   imports: [
@@ -16,6 +18,7 @@ import {SvgPathShowcaseModule} from './svg-path-showcase/svg-path-showcase.modul
     RouterModule.forRoot([
       {path: 'form/:formName', component: GenericFormShowcaseComponent},
       {path: 'panel', component: BarAndPanelShowcaseComponent},
+      {path: 'layout', component: GridBuilderShowcaseComponent},
       {path: 'svg', component: SvgPathShowcaseComponent},
       {path: '**', redirectTo: '/form/form1'},
     ]),
@@ -23,6 +26,7 @@ import {SvgPathShowcaseModule} from './svg-path-showcase/svg-path-showcase.modul
     BarAndPanelShowcaseModule,
     GenericFormShowcaseModule,
     SvgPathShowcaseModule,
+    GridBuilderShowcaseModule,
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},

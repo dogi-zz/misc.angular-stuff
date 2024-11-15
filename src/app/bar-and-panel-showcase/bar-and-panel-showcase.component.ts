@@ -113,7 +113,7 @@ export class BarAndPanelShowcaseComponent implements OnInit {
 
   public stickyPanelVisible = true;
 
-  constructor() {
+  public constructor() {
   }
 
   public ngOnInit(): void {

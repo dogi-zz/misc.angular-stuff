@@ -1,48 +1,51 @@
-// import {beforeEach, describe, expect, it} from '@jest/globals';
-// import {BehaviorSubject} from 'rxjs';
-// import {GenericFormInstance} from '../../src/app/generic-form/generic-form-instance';
-// import {FormDefinition, ValidationTexts} from '../../src/app/generic-form/generic-form.data';
-// import {FormDefElementSelectOption} from "../../src/app/generic-form/generic-form-definition-new";
-//
-//
-// describe('generic-form-subform', () => {
-//
-//   beforeEach(async () => {
-//
-//   });
-//
-//
-//   it('Subform - Check Primitive Data', async () => {
-//     let formInstance: GenericFormInstance;
-//     let formDefinition: FormDefinition;
-//
-//     const getOutputValue = (model: any) => {
-//       formInstance.setModel(model);
-//       return formInstance.outputModel;
-//     };
-//
-//     formDefinition = {
-//       name: {caption: null, type: 'text'},
-//       sub1: {
-//         type: 'subform',
-//         inline: true,
-//         content: {
-//           age1: {caption: null, type: 'integer'},
-//           weight1: {caption: null, type: 'number'},
-//           employed1: {caption: null, type: 'boolean'},
-//         },
-//       },
-//       sub2: {
-//         type: 'subform',
-//         inline: true,
-//         content: {
-//           name2: {caption: null, type: 'text', required: true},
-//           age2: {caption: null, type: 'integer', required: true},
-//           weight2: {caption: null, type: 'number', required: true},
-//           employed2: {caption: null, type: 'boolean', required: true},
-//         },
-//       },
-//     };
+/* eslint  prefer-const: 0 */
+import {beforeEach, describe, expect} from "@jest/globals";
+import {GenericFormInstance} from "../../libs/generic-form/generic-form-instance";
+import {FormDefinition} from "../../libs/generic-form/generic-form-definition";
+import {fromUiItems} from "./tools";
+
+describe(__filename, () => {
+
+  beforeEach(async () => {
+
+  });
+
+
+  it('Subform - Layout-Subform', async () => {
+    let formInstance: GenericFormInstance;
+    let formDefinition: FormDefinition;
+
+
+    formDefinition = {
+      name: {caption: null, type: 'text'},
+      subForm: {
+        type: 'subform',
+        caption: 'structure',
+        help: 'Some Structured Data',
+        content: {
+          age: {caption: null, type: 'integer'},
+          weight: {caption: null, type: 'number'},
+          employed: {caption: null, type: 'boolean'},
+        },
+      },
+    };
+
+
+    formInstance = new GenericFormInstance(formDefinition, {});
+    console.info(fromUiItems(formInstance.uiItems));
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      name: {path: 'name', type: 'input', inputType: 'text'},
+      subForm: {
+        path: 'subForm', type: 'object', required: true,
+        caption: {caption: 'structure', help: 'Some Structured Data'},
+        children: {
+          age: {path: 'age', type: 'input', inputType: 'integer'},
+          weight: {path: 'weight', type: 'input', inputType: 'number'},
+          employed: {path: 'employed', type: 'input', inputType: 'boolean'},
+        },
+      },
+    });
+
 //     formInstance = new GenericFormInstance(formDefinition);
 //
 //     expect(getOutputValue({})).toEqual({name: null, age1: null, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
@@ -264,8 +267,8 @@
 //     expect(formInstance.outputModel).toEqual({array1: ['foo']});
 //     expect(formInstance.errors.value).toEqual({});
 //
-//
-//   });
-//
-//
-// });
+
+  });
+
+
+});

@@ -1,9 +1,9 @@
-import {FormDefElement, FormDefElementSelect, FormDefinition, FormDefPrimitiveTypes, FormDefValidationElement} from "../../../libs/generic-form/generic-form-definition";
+import {FormDefElement, FormDefElementSelect, FormDefinition, FormDefObjectElement, FormDefPrimitive, FormDefPrimitiveTypes, FormDefValidationElement} from "../../../libs/generic-form/generic-form-definition";
 import {BehaviorSubject} from "rxjs";
 import * as _ from 'lodash';
 import {ResolvedFormData} from "./generic-form-showcase.component";
 
-const forEachOptions = (path: string[], def: FormDefElement, callback: (path: string[], element: FormDefElementSelect) => void) => {
+const forEachOptions = (path: string[], def: FormDefObjectElement, callback: (path: string[], element: FormDefElementSelect) => void) => {
   if (def.type === 'selection') {
     callback(path, def);
   }
@@ -15,12 +15,17 @@ const forEachOptions = (path: string[], def: FormDefElement, callback: (path: st
       forEachOptions([...path, key], value, callback);
     });
   }
+  if (def.type === 'subform') {
+    Object.entries(def.content).forEach(([key, value]) => {
+      forEachOptions([...path, key], value, callback);
+    });
+  }
 };
 
-const forEachValidations = (path: string[], def: FormDefElement, callback: (path: string[], element: FormDefValidationElement) => void) => {
+const forEachValidations = (path: string[], def: FormDefObjectElement, callback: (path: string[], element: FormDefValidationElement) => void) => {
   if (FormDefPrimitiveTypes.includes(def.type)) {
-    if (def.validate !== undefined) {
-      callback(path, def);
+    if ((def as FormDefPrimitive).validate !== undefined) {
+      callback(path, def as FormDefPrimitive);
     }
   }
   if (def.type === 'array') {
@@ -34,6 +39,11 @@ const forEachValidations = (path: string[], def: FormDefElement, callback: (path
       callback(path, def);
     }
     Object.entries(def.properties).forEach(([key, value]) => {
+      forEachValidations([...path, key], value, callback);
+    });
+  }
+  if (def.type === 'subform') {
+    Object.entries(def.content).forEach(([key, value]) => {
       forEachValidations([...path, key], value, callback);
     });
   }

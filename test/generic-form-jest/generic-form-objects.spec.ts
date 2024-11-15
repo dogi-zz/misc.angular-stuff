@@ -1,9 +1,9 @@
+/* eslint  prefer-const: 0 */
 import {beforeEach, describe, expect, it} from '@jest/globals';
 import {ValidationTexts} from '../../libs/generic-form/generic-form-commons';
 import {FormDefinition} from '../../libs/generic-form/generic-form-definition';
 import {GenericFormInstance} from '../../libs/generic-form/generic-form-instance';
 import {fromUiItems} from './tools';
-/* eslint  prefer-const: 0 */
 
 
 describe(__filename, () => {

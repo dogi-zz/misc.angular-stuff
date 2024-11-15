@@ -12,6 +12,7 @@ import {formDef2, model2} from './generic-form-definitions-2';
 import {formDef3, model3} from './generic-form-definitions-3';
 import {asyncOptions4, formDef4, model4} from './generic-form-definitions-4';
 import {formDef5, model5, validationFunctions5} from './generic-form-definitions-5';
+import {formDef6, model6} from './generic-form-definitions-6';
 import {resolveFormFromInput} from "./generic-form-showcare-helper";
 import {GenericFormInstance} from "../../../libs/generic-form/generic-form-instance";
 import {ObjectChecker, ObjectCheckerAny, ObjectCheckerArray, ObjectCheckerObject} from "../../../libs/json-parser/src/object-checker";
@@ -27,8 +28,7 @@ const formDefinitions: { [formKey: string]: { form: FormDefinition, model: any, 
   form3: {form: formDef3, model: model3},
   form4: {form: formDef4, model: model4, asyncOptions: asyncOptions4},
   form5: {form: formDef5, model: model5, validationFunctions: validationFunctions5},
-  // form4: {form: formDef4, model: model4, optionObservables: optionObservables4, validationFunctions: validationFunctions4},
-  // form5: {form: formDef5, model: model5},
+  form6: {form: formDef6, model: model6},
 };
 
 
@@ -181,7 +181,7 @@ type EditFormOption = { path: string, options: string, error: string, receivedSt
 })
 export class GenericFormShowcaseComponent implements OnInit, OnDestroy {
 
-  @ViewChild('genericForm') private genericForm: GenericFormComponent
+  @ViewChild('genericForm') private genericForm: GenericFormComponent;
 
 
   public options: { label: string, value: string }[] = [
@@ -190,6 +190,7 @@ export class GenericFormShowcaseComponent implements OnInit, OnDestroy {
     {value: 'form3', label: 'Arrays'},
     {value: 'form4', label: 'Async'},
     {value: 'form5', label: 'Validation'},
+    {value: 'form6', label: 'Subform'},
     // Conditions
   ];
 
@@ -403,10 +404,10 @@ export class GenericFormShowcaseComponent implements OnInit, OnDestroy {
 
   public setValidationFunction(path: string, code: string) {
     console.info('setValidationFunction', path, code, this);
-    this.zone.run(()=>{
+    this.zone.run(() => {
       this.resolvedFormData.validationFunctions[path].funcCode = code;
       this.checkAfterEditValidation();
-    })
+    });
   }
 
   public checkAfterEditValidation() {

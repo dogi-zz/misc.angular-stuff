@@ -5,6 +5,9 @@
   <div class="menu-item" [class.active]="showPage === 'panel'" (click)="router.navigate(['/panel'])">
     <span>Panel</span>
   </div>
+  <div class="menu-item" [class.active]="showPage === 'layout'" (click)="router.navigate(['/layout'])">
+    <span>Layout</span>
+  </div>
   <div class="menu-item" [class.active]="showPage === 'svg'" (click)="router.navigate(['/svg'])">
     <span>SVG-Path</span>
   </div>
