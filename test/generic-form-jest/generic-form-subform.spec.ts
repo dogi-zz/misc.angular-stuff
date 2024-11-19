@@ -3,6 +3,7 @@ import {beforeEach, describe, expect} from "@jest/globals";
 import {GenericFormInstance} from "../../libs/generic-form/generic-form-instance";
 import {FormDefinition} from "../../libs/generic-form/generic-form-definition";
 import {fromUiItems} from "./tools";
+import {ValidationTexts} from "../../libs/generic-form/generic-form-commons";
 
 describe(__filename, () => {
 
@@ -32,7 +33,6 @@ describe(__filename, () => {
 
 
     formInstance = new GenericFormInstance(formDefinition, {});
-    console.info(fromUiItems(formInstance.uiItems));
     expect(fromUiItems(formInstance.uiItems)).toEqual({
       name: {path: 'name', type: 'input', inputType: 'text'},
       subForm: {
@@ -45,228 +45,396 @@ describe(__filename, () => {
         },
       },
     });
+  });
 
-//     formInstance = new GenericFormInstance(formDefinition);
-//
-//     expect(getOutputValue({})).toEqual({name: null, age1: null, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({name: 'foo'})).toEqual({name: 'foo', age1: null, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({age1: 32})).toEqual({name: null, age1: 32, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({age1: 32.5})).toEqual({name: null, age1: 33, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({age1: 0})).toEqual({name: null, age1: 0, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({weight1: 65.5})).toEqual({name: null, age1: null, weight1: 65.5, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({employed1: false})).toEqual({name: null, age1: null, weight1: null, employed1: false, name2: null, age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({employed1: true})).toEqual({name: null, age1: null, weight1: null, employed1: true, name2: null, age2: null, weight2: null, employed2: null});
-//
-//     expect(getOutputValue({name2: 'bar'})).toEqual({name: null, age1: null, weight1: null, employed1: null, name2: 'bar', age2: null, weight2: null, employed2: null});
-//     expect(getOutputValue({age1: 32, age2: 33})).toEqual({name: null, age1: 32, weight1: null, employed1: null, name2: null, age2: 33, weight2: null, employed2: null});
-//     expect(getOutputValue({employed2: false})).toEqual({name: null, age1: null, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: false});
-//
-//     expect(getOutputValue({name: 'foo', age1: 32, bar: true})).toEqual({name: 'foo', age1: 32, weight1: null, employed1: null, name2: null, age2: null, weight2: null, employed2: null});
-//
-//   });
-//
-//   it('Subform - Validate Primitive Data', async () => {
-//     let formInstance: GenericFormInstance;
-//     let formDefinition: FormDefinition;
-//
-//     const getValidationResult = (model: any) => {
-//       formInstance.setModel(model);
-//       return formInstance.errors.value;
-//     };
-//
-//
-//     formDefinition = {
-//       sub1: {
-//         type: 'subform',
-//         inline: true,
-//         content: {
-//           name_1: {caption: null, type: 'text'},
-//           name_2: {caption: null, type: 'text', required: true},
-//           age_1: {caption: null, type: 'integer'},
-//           age_2: {caption: null, type: 'integer', required: true},
-//         },
-//       },
-//       sub2: {
-//         type: 'subform',
-//         inline: false,
-//         caption: 'Sub2',
-//         content: {
-//           weight_1: {caption: null, type: 'number'},
-//           weight_2: {caption: null, type: 'number', required: true},
-//           employed_1: {caption: null, type: 'boolean'},
-//           employed_2: {caption: null, type: 'boolean', required: true},
-//         },
-//       },
-//     };
-//     formInstance = new GenericFormInstance(formDefinition);
-//
-//     expect(getValidationResult({})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({name_1: 123, name_2: 'test'})).toEqual({
-//       '.name_1': ValidationTexts.typeError,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({age_1: 123, age_2: 'test'})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_2': ValidationTexts.typeError,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({age_1: true})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_1': ValidationTexts.typeError,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({age_1: NaN})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_1': ValidationTexts.NaN,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({age_1: Infinity})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_1': ValidationTexts.NaN,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({weight_1: false})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_1': ValidationTexts.typeError,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//     expect(getValidationResult({employed_1: 0})).toEqual({
-//       '.name_2': ValidationTexts.required,
-//       '.age_2': ValidationTexts.required,
-//       '.weight_2': ValidationTexts.required,
-//       '.employed_1': ValidationTexts.typeError,
-//       '.employed_2': ValidationTexts.required,
-//     });
-//   });
-//
-//   it('Subform - Set Value on  Objects', async () => {
-//     let formInstance: GenericFormInstance;
-//     let formDefinition: FormDefinition;
-//
-//
-//     formDefinition = {
-//       name: {caption: null, type: 'text'},
-//       sub1: {
-//         type: 'subform',
-//         inline: true,
-//         content: {
-//           position: {
-//             type: 'object',
-//             caption: 'Position',
-//             required: true,
-//             properties: {
-//               posX: {caption: null, type: 'integer', required: true},
-//               posY: {caption: null, type: 'integer', required: true},
-//             },
-//           },
-//         },
-//       },
-//     };
-//     formInstance = new GenericFormInstance(formDefinition);
-//
-//     formInstance.setModel({});
-//
-//     expect(formInstance.outputModel).toEqual({name: null, position: {posX: null, posY: null}});
-//     expect(formInstance.errors.value['.position']).toEqual(undefined);
-//
-//     formInstance.setValue('.position', {});
-//     expect(formInstance.outputModel).toEqual({name: null, position: {posX: null, posY: null}});
-//     expect(formInstance.errors.value['.position']).toEqual(undefined);
-//     expect(formInstance.errors.value['.position.posX']).toEqual(ValidationTexts.required);
-//
-//     formInstance.setValue('.position.posX', 'foo');
-//     expect(formInstance.outputModel).toEqual({name: null, position: {posX: null, posY: null}});
-//     expect(formInstance.errors.value['.position']).toEqual(undefined);
-//     expect(formInstance.errors.value['.position.posX']).toEqual(ValidationTexts.typeError);
-//
-//     formInstance.setValue('.position.posX', 0);
-//     expect(formInstance.outputModel).toEqual({name: null, position: {posX: 0, posY: null}});
-//     expect(formInstance.errors.value['.position']).toEqual(undefined);
-//     expect(formInstance.errors.value['.position.posX']).toEqual(undefined);
-//
-//   });
-//
-//
-//   it('Subform -  Check and Validate Array with Async Options', async () => {
-//     let formInstance: GenericFormInstance;
-//     let formDefinition: FormDefinition;
-//
-//     const getValidationResult = (model: any) => {
-//       formInstance.setModel(model);
-//       return formInstance.errors.value;
-//     };
-//     const getOutputValue = (model: any) => {
-//       formInstance.setModel(model);
-//       return formInstance.outputModel;
-//     };
-//
-//     const options1 = new BehaviorSubject<FormDefElementSelectOption[]>([]);
-//
-//     formDefinition = {
-//       sub1: {
-//         type: 'subform',
-//         inline: true,
-//         content: {
-//           array1: {
-//             type: 'array',
-//             caption: 'Object Array',
-//             required: true,
-//             elements: {
-//               type: 'selection',
-//               options: options1,
-//             },
-//           },
-//         },
-//       },
-//
-//     };
-//     formInstance = new GenericFormInstance(formDefinition);
-//
-//     expect(getOutputValue({})).toEqual({ array1: []});
-//     expect(getOutputValue({array1: true})).toEqual({array1: []});
-//     expect(getOutputValue({array1: 'foo'})).toEqual({array1: []});
-//     expect(getOutputValue({array1: null})).toEqual({array1: []});
-//
-//     expect(getValidationResult({})).toEqual({});
-//     expect(getValidationResult({array1: true})).toEqual({
-//       '.array1': ValidationTexts.typeError,
-//     });
-//     expect(getValidationResult({array1: 'foo'})).toEqual({
-//       '.array1': ValidationTexts.typeError,
-//     });
-//
-//
-//     formInstance.setModel({array1: ['foo']});
-//
-//     expect(formInstance.outputModel).toEqual({array1: [null]});
-//     expect(formInstance.errors.value).toEqual({
-//       '.array1.0': ValidationTexts.optionError,
-//     });
-//
-//     options1.next([
-//       {label: 'var1', value: 'foo'},
-//       {label: 'var2', value: 'bar'},
-//     ]);
-//
-//     expect(formInstance.outputModel).toEqual({array1: ['foo']});
-//     expect(formInstance.errors.value).toEqual({});
-//
+
+  it('Subform - Selection-Subform', async () => {
+    let formInstance: GenericFormInstance;
+    let formDefinition: FormDefinition;
+
+
+    formDefinition = {
+      subformType: {caption: null, type: 'integer'},
+      subForm1: {
+        type: 'subform',
+        caption: 'structure',
+        help: 'Some Structured Data 1',
+        condition: {path: 'subformType', condition: "eq", value: 1},
+        content: {
+          age1: {caption: null, type: 'integer'},
+          weight1: {caption: null, type: 'number'},
+          employed1: {caption: null, type: 'boolean'},
+        },
+      },
+      subForm2: {
+        type: 'subform',
+        inline: true,
+        condition: {path: 'subformType', condition: "eq", value: 2},
+        content: {
+          age2: {caption: null, type: 'integer'},
+          weight2: {caption: null, type: 'number'},
+          employed2: {caption: null, type: 'boolean'},
+        },
+      },
+    };
+
+
+    formInstance = new GenericFormInstance(formDefinition, {});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance = new GenericFormInstance(formDefinition, {subformType: 1});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      subForm1: {
+        path: 'subForm1', type: 'object', required: true,
+        caption: {caption: 'structure', help: 'Some Structured Data 1'},
+        children: {
+          age1: {path: 'age1', type: 'input', inputType: 'integer'},
+          weight1: {path: 'weight1', type: 'input', inputType: 'number'},
+          employed1: {path: 'employed1', type: 'input', inputType: 'boolean'},
+        },
+      },
+    });
+    expect(formInstance.outputModel).toEqual({subformType: 1, age1: null, weight1: null, employed1: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance = new GenericFormInstance(formDefinition, {subformType: 2, age1: 12, weight1: 12.5, employed1: false});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      age2: {path: 'age2', type: 'input', inputType: 'integer'},
+      weight2: {path: 'weight2', type: 'input', inputType: 'number'},
+      employed2: {path: 'employed2', type: 'input', inputType: 'boolean'},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: 2, age2: null, weight2: null, employed2: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+
+    formInstance = new GenericFormInstance(formDefinition, {subformType: 2, age2: 12, weight1: 12.5, employed1: false});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      age2: {path: 'age2', type: 'input', inputType: 'integer'},
+      weight2: {path: 'weight2', type: 'input', inputType: 'number'},
+      employed2: {path: 'employed2', type: 'input', inputType: 'boolean'},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: 2, age2: 12, weight2: null, employed2: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+
+  });
+
+  it('Subform - Selection with validation', async () => {
+    let formInstance: GenericFormInstance;
+    let formDefinition: FormDefinition;
+
+
+    formDefinition = {
+      subformType: {caption: null, type: 'integer'},
+      subForm1: {
+        type: 'subform',
+        caption: 'structure',
+        help: 'Some Structured Data 1',
+        condition: {path: 'subformType', condition: "eq", value: 1},
+        content: {
+          age1: {caption: null, type: 'integer', required: true},
+          weight1: {caption: null, type: 'number'},
+          employed1: {caption: null, type: 'boolean'},
+        },
+      },
+      subForm2: {
+        type: 'subform',
+        inline: true,
+        condition: {path: 'subformType', condition: "eq", value: 2},
+        content: {
+          age2: {caption: null, type: 'integer', required: true},
+          weight2: {caption: null, type: 'number'},
+          employed2: {caption: null, type: 'boolean'},
+        },
+      },
+    };
+
+
+    formInstance = new GenericFormInstance(formDefinition, {weight1: 12.5, weight2: 13.7});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance = new GenericFormInstance(formDefinition, {subformType: 1, weight1: 12.5, weight2: 13.7});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      subForm1: {
+        path: 'subForm1', type: 'object', required: true,
+        caption: {caption: 'structure', help: 'Some Structured Data 1'},
+        children: {
+          age1: {path: 'age1', type: 'input', inputType: 'integer'},
+          weight1: {path: 'weight1', type: 'input', inputType: 'number'},
+          employed1: {path: 'employed1', type: 'input', inputType: 'boolean'},
+        },
+      },
+    });
+    expect(formInstance.outputModel).toEqual({subformType: 1, age1: null, weight1: 12.5, employed1: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({
+      'age1': ValidationTexts.required,
+    });
+
+    formInstance = new GenericFormInstance(formDefinition, {subformType: 2, weight1: 12.5, weight2: 13.7});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      age2: {path: 'age2', type: 'input', inputType: 'integer'},
+      weight2: {path: 'weight2', type: 'input', inputType: 'number'},
+      employed2: {path: 'employed2', type: 'input', inputType: 'boolean'},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: 2, age2: null, weight2: 13.7, employed2: null});
+    expect(formInstance.outputErrors.value.export()).toEqual({
+      'age2': ValidationTexts.required,
+    });
+
+
+  });
+
+  it('Subform - Selection in Array 1', async () => {
+    let formInstance: GenericFormInstance;
+    let formDefinition: FormDefinition;
+
+
+    formDefinition = {
+      data: {
+        type: "array",
+        caption: null,
+        required: true,
+        elements: {
+          type: 'object',
+          required: true,
+          properties: {
+            subformType: {caption: null, type: 'integer'},
+            subForm1: {
+              type: 'subform',
+              caption: 'structure',
+              help: 'Some Structured Data 1',
+              condition: {path: 'subformType', condition: "eq", value: 1},
+              content: {
+                age1: {caption: null, type: 'integer', required: true},
+                weight1: {caption: null, type: 'number'},
+                employed1: {caption: null, type: 'boolean'},
+              },
+            },
+            subForm2: {
+              type: 'subform',
+              inline: true,
+              condition: {path: 'subformType', condition: "eq", value: 2},
+              content: {
+                age2: {caption: null, type: 'integer', required: true},
+                weight2: {caption: null, type: 'number'},
+                employed2: {caption: null, type: 'boolean'},
+              },
+            },
+          },
+        },
+      },
+    };
+
+
+    formInstance = new GenericFormInstance(formDefinition, {});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      data: {path: 'data', type: 'array', required: true, canAdd: true, children: []},
+    });
+    expect(formInstance.outputModel).toEqual({data: []});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance = new GenericFormInstance(formDefinition, {data: [null, null]});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      data: {
+        path: 'data', type: 'array', required: true, canAdd: true, children: [
+          {
+            path: 'data.0', type: 'object', required: true, children: {
+              subformType: {path: 'data.0.subformType', type: 'input', inputType: 'integer'},
+            },
+          },
+          {
+            path: 'data.1', type: 'object', required: true, children: {
+              subformType: {path: 'data.1.subformType', type: 'input', inputType: 'integer'},
+            },
+          },
+        ],
+      },
+    });
+    expect(formInstance.outputModel).toEqual({
+      data: [
+        {subformType: null},
+        {subformType: null},
+      ]
+    });
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance.setValue(['data', 0, 'subformType'], 1);
+    formInstance.setValue(['data', 1, 'subformType'], 2);
+
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      data: {
+        path: 'data', type: 'array', required: true, canAdd: true, children: [
+          {
+            path: 'data.0', type: 'object', required: true, children: {
+              subformType: {path: 'data.0.subformType', type: 'input', inputType: 'integer'},
+              subForm1: {
+                path: 'data.0.subForm1', type: 'object', required: true,
+                caption: {caption: 'structure', help: 'Some Structured Data 1'},
+                children: {
+                  age1: {path: 'data.0.age1', type: 'input', inputType: 'integer'},
+                  weight1: {path: 'data.0.weight1', type: 'input', inputType: 'number'},
+                  employed1: {path: 'data.0.employed1', type: 'input', inputType: 'boolean'},
+                },
+              },
+            },
+          },
+          {
+            path: 'data.1', type: 'object', required: true, children: {
+              subformType: {path: 'data.1.subformType', type: 'input', inputType: 'integer'},
+              age2: {path: 'data.1.age2', type: 'input', inputType: 'integer'},
+              weight2: {path: 'data.1.weight2', type: 'input', inputType: 'number'},
+              employed2: {path: 'data.1.employed2', type: 'input', inputType: 'boolean'},
+            },
+          },
+        ],
+      },
+    });
+    expect(formInstance.outputModel).toEqual({
+      data: [
+        {subformType: 1, age1: null, weight1: null, employed1: null},
+        {subformType: 2, age2: null, weight2: null, employed2: null},
+      ],
+    });
+    expect(formInstance.outputErrors.value.export()).toEqual({
+      'data.0.age1': 'this is required',
+      'data.1.age2': 'this is required',
+    });
+
+  });
+
+
+  it('Subform - Selection in Array 2', async () => {
+    let formInstance: GenericFormInstance;
+    let formDefinition: FormDefinition;
+
+
+    formDefinition = {
+      subformType: {caption: null, type: 'integer'},
+      data: {
+        type: "array",
+        caption: null,
+        required: true,
+        elements: {
+          type: 'object',
+          required: true,
+          properties: {
+            subForm1: {
+              type: 'subform',
+              caption: 'structure',
+              help: 'Some Structured Data 1',
+              condition: {path: '-.-.subformType', condition: "eq", value: 1},
+              content: {
+                age1: {caption: null, type: 'integer', required: true},
+                weight1: {caption: null, type: 'number'},
+                employed1: {caption: null, type: 'boolean'},
+              },
+            },
+            subForm2: {
+              type: 'subform',
+              inline: true,
+              condition: {path: '-.-.subformType', condition: "eq", value: 2},
+              content: {
+                age2: {caption: null, type: 'integer', required: true},
+                weight2: {caption: null, type: 'number'},
+                employed2: {caption: null, type: 'boolean'},
+              },
+            },
+          },
+        },
+      },
+    };
+
+
+    formInstance = new GenericFormInstance(formDefinition, {});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      data: {path: 'data', type: 'array', required: true, canAdd: true, children: []},
+    });
+    expect(formInstance.outputModel).toEqual({subformType: null, data: []});
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance = new GenericFormInstance(formDefinition, {data: [null, null]});
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      data: {
+        path: 'data', type: 'array', required: true, canAdd: true, children: [
+          {
+            path: 'data.0', type: 'object', required: true, children: {},
+          },
+          {
+            path: 'data.1', type: 'object', required: true, children: {},
+          },
+        ],
+      },
+    });
+    expect(formInstance.outputModel).toEqual({
+      subformType: null,
+      data: [
+        {},
+        {},
+      ],
+    });
+    expect(formInstance.outputErrors.value.export()).toEqual({});
+
+    formInstance.setValue(['subformType'], 1);
+
+    expect(fromUiItems(formInstance.uiItems)).toEqual({
+      subformType: {path: 'subformType', type: 'input', inputType: 'integer'},
+      data: {
+        path: 'data', type: 'array', required: true, canAdd: true, children: [
+          {
+            path: 'data.0', type: 'object', required: true, children: {
+              subForm1: {
+                path: 'data.0.subForm1', type: 'object', required: true,
+                caption: {caption: 'structure', help: 'Some Structured Data 1'},
+                children: {
+                  age1: {path: 'data.0.age1', type: 'input', inputType: 'integer'},
+                  weight1: {path: 'data.0.weight1', type: 'input', inputType: 'number'},
+                  employed1: {path: 'data.0.employed1', type: 'input', inputType: 'boolean'},
+                },
+              },
+            },
+          },
+          {
+            path: 'data.1', type: 'object', required: true, children: {
+              subForm1: {
+                path: 'data.1.subForm1', type: 'object', required: true,
+                caption: {caption: 'structure', help: 'Some Structured Data 1'},
+                children: {
+                  age1: {path: 'data.1.age1', type: 'input', inputType: 'integer'},
+                  weight1: {path: 'data.1.weight1', type: 'input', inputType: 'number'},
+                  employed1: {path: 'data.1.employed1', type: 'input', inputType: 'boolean'},
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+    expect(formInstance.outputModel).toEqual({
+      subformType: 1,
+      data: [
+        {age1: null, weight1: null, employed1: null},
+        {age1: null, weight1: null, employed1: null},
+      ],
+    });
+    expect(formInstance.outputErrors.value.export()).toEqual({
+      'data.0.age1': 'this is required',
+      'data.1.age1': 'this is required',
+    });
 
   });
 

@@ -14,49 +14,41 @@ export const formDef6: FormDefinition = {
       employed: {caption: 'Employed', help: 'just some value', type: 'boolean'},
     },
   },
-  // child_count: {
-  //   caption: 'Child Count', type: 'integer',
-  //   min: 0, max: 5,
-  // },
-  // children: {
-  //   caption: 'Children', type: 'array',
-  //   condition: {path: 'child_count', condition: 'eq', value: 1},
-  //   required: true, minLength: 1, maxLength: 1,
-  //   elements: {
-  //     type: 'object',
-  //     required: true,
-  //     properties: {
-  //       name: {caption: 'Name', type: 'text', required: true},
-  //       age: {caption: 'Age', type: 'integer', required: true},
-  //     },
-  //   },
-  // },
-  // childrenNames: {
-  //   caption: 'Children Names', type: 'array',
-  //   condition: {path: 'child_count', condition: 'eq', value: 2},
-  //   required: true,  minLength: 2, maxLength: 2,
-  //   elements: {
-  //     type: 'text',
-  //     required: true,
-  //   },
-  // },
-  // showSubform: {
-  //   caption: 'Show Subform', type: 'boolean', required: true,
-  // },
-  // subForm : {
-  //   type: 'subform',
-  //   inline: true,
-  //   condition: {path: 'showSubform', condition: 'eq', value: true},
-  //   content: {
-  //     employed: {
-  //       caption: 'Employed', type: 'boolean', required: true,
-  //     },
-  //     jobName: {
-  //       condition: {path: 'employed', condition: 'eq', value: true},
-  //       caption: 'Job Name', type: 'text', required: true,
-  //     },
-  //   },
-  // },
+  subformType: {
+    caption: 'Contitional Subform', type: 'selection',
+    options: [
+      {label: 'unknown', value: null},
+      {label: 'form-1', value: 'form1'},
+      {label: 'form-1-extended', value: 'form1-e'},
+      {label: 'form-2 (inline)', value: 'form2'},
+    ],
+  },
+  selectiveForm1: {
+    type: 'subform',
+    caption: 'Selective Form 1',
+    help: 'Some Structured Data 1',
+    condition: {path: 'subformType', condition: "in", value: ['form1', 'form1-e']},
+    content: {
+      age1: {caption: 'Age 1', type: 'integer', required: true},
+      weight1: {caption: 'Weight 1', type: 'number'},
+      employed1: {caption: 'Employed 1', type: 'boolean'},
+      extended1: {
+        caption: 'Extended String', type: 'text', layout: 'wide', required: true,
+        condition: {path: '-.subformType', condition: "eq", value: 'form1-e'},
+      },
+    },
+  },
+  selectiveForm2: {
+    type: 'subform',
+    inline: true,
+    condition: {path: 'subformType', condition: "eq", value: 'form2'},
+    content: {
+      age2: {caption: 'Age 2', type: 'integer', required: true},
+      weight2: {caption: 'Weight 2', type: 'number'},
+      employed2: {caption: 'Employed 2', type: 'boolean'},
+    },
+  },
+
 };
 
 export const model6: any = {
