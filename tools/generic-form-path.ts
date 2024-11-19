@@ -50,9 +50,6 @@ export class Path {
     if (this.items.length !== other.items.length) {
       return false;
     }
-    if (this._parent === other._parent) {
-      return this.tail === other.tail;
-    }
     return this.items.every((value, i) => other.items[i] === value);
   }
 

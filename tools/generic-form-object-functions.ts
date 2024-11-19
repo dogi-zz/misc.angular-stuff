@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs';
 import {ValidationTexts} from '../generic-form-commons';
-import {asFormDefBaseElementInline, FormDefArray, FormDefElement, FormDefElementInteger, FormDefElementNumber, FormDefObject, FormDefPrimitiveType, FormDefPrimitiveTypes} from '../generic-form-definition';
+import {asFormDefBaseElementInline, FormDefArray, FormDefElement, FormDefElementInteger, FormDefElementNumber, FormDefObject, FormDefPrimitive, FormDefPrimitiveTypes, FormDefSubform} from '../generic-form-definition';
 import {Path} from './generic-form-path';
 
 export const isPrimitive = (obj: any) => {
@@ -23,7 +23,7 @@ export const isNotEmpty = (obj: any) => {
   return !isEmpty(obj);
 };
 
-export const isPrimitiveElement = (obj: FormDefElement) => {
+export const isPrimitiveElement = (obj: FormDefElement | FormDefSubform) => {
   return FormDefPrimitiveTypes.includes(obj.type);
 };
 
@@ -118,7 +118,7 @@ const validateMinMax = (def: FormDefElementNumber | FormDefElementInteger, value
   return [value, null];
 };
 
-export const getValueForPrimitive = (def: FormDefPrimitiveType, value: any): [any, string] => {
+export const getValueForPrimitive = (def: FormDefPrimitive, value: any): [any, string] => {
   if ((value ?? null) === null) {
     return def.required ? [null, ValidationTexts.required] : [null, null];
   }

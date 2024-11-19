@@ -5,7 +5,7 @@ import {Subscription} from 'rxjs';
 import {GenericFormComponent} from '../generic-form.component';
 import {FormDefBaseElementRequired, FormValidationResult} from '../generic-form.data';
 import {WidgetControl} from './generic-form-component.data';
-import {FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormDefPrimitiveType} from "../generic-form-definition";
+import {FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormDefPrimitive} from "../generic-form-definition";
 
 @Component({
   selector: '[generic-form-input]',
@@ -117,7 +117,7 @@ import {FormDefElementInteger, FormDefElementNumber, FormDefElementSelect, FormD
 export class GenericFormInputComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input()
-  public element: FormDefPrimitiveType;
+  public element: FormDefPrimitive;
 
   // @Input()
   // public isArrayElement: boolean;

@@ -13,16 +13,18 @@ export type FormModelArray = FormModelValue[];
 
 
 export const FormDefPrimitiveTypes = ['text', 'number', 'integer', 'selection', 'boolean'];
-export type FormDefPrimitiveType = FormDefElementText | FormDefElementNumber | FormDefElementInteger | FormDefElementSelect | FormDefElementBoolean;
 
 export type FormDefinition = {
   [name: string]:
-    (FormDefPrimitiveType & FormDefBaseElementCaption & FormDefBaseConditionElement) |
+    (FormDefPrimitive & FormDefBaseElementCaption & FormDefBaseConditionElement) |
     (FormDefObject & FormDefBaseConditionElement & (FormDefBaseElementCaption | FormDefBaseElementInline)) |
+    (FormDefSubform & FormDefBaseConditionElement & (FormDefBaseElementCaption | FormDefBaseElementInline)) |
     (FormDefArray & FormDefBaseElementCaption),
 };
 
-export type FormDefElement = FormDefPrimitiveType | FormDefObject | FormDefArray; // TODO: HIER  | FormDefSubform;
+export type FormDefPrimitive = FormDefElementText | FormDefElementNumber | FormDefElementInteger | FormDefElementSelect | FormDefElementBoolean;
+export type FormDefElement = FormDefPrimitive | FormDefObject | FormDefArray;
+export type FormDefObjectElement = FormDefPrimitive | FormDefObject | FormDefArray  | FormDefSubform;
 
 
 // ==== MIXINS ====
@@ -37,7 +39,7 @@ export type FormDefBaseElementInline = {
 };
 
 
-export type FormDefCondition = { path: string, condition?: 'eq' | 'ne', value: any };
+export type FormDefCondition = { path: string, condition?: 'eq' | 'ne', value: any } |  { path: string, condition: 'in' | 'not-in', value: any[] };
 export type FormDefBaseConditionElement = {
   condition?: FormDefCondition;
 };
@@ -48,7 +50,7 @@ export type FormDefValidationElement = {
 
 export const asFormDefBaseConditionElement = (obj: any) => obj as FormDefBaseConditionElement;
 export const asFormDefBaseElementInline = (obj: any) => obj as FormDefBaseElementInline;
-export const getCaption = (def: FormDefElement) => (def as any).caption || (def as any).help ? {caption: (def as any).caption, help: (def as any).help} : undefined;
+export const getCaption = (def: FormDefObjectElement) => (def as any).caption || (def as any).help ? {caption: (def as any).caption, help: (def as any).help} : undefined;
 
 // ==== BASIC ELEMENT TYPES ====
 
@@ -95,13 +97,14 @@ export type FormDefObject = FormDefValidationElement & {
 export type FormDefArray = FormDefValidationElement & {
   type: 'array',
 
-  elements: FormDefPrimitiveType | FormDefObject | FormDefArray,
+  elements: FormDefPrimitive | FormDefObject | FormDefArray,
   minLength?: number;
   maxLength?: number;
   required?: boolean;
 };
-// export type FormDefSubform = FormDefBaseConditionElement & {
-//   type: 'subform',
-//   content: { [name: string]: FormDefElementInObject },
-// };
+
+export type FormDefSubform = FormDefBaseConditionElement & {
+  type: 'subform',
+  content: FormDefinition,
+};
 

@@ -1,22 +1,22 @@
 import {Observable, Observer, Subscription} from 'rxjs';
-import {FormDefArray, FormDefElement, FormDefinition, FormDefObject} from '../generic-form-definition';
+import {FormDefArray, FormDefElement, FormDefinition, FormDefObject, FormDefObjectElement, FormDefSubform} from '../generic-form-definition';
 import {isPrimitiveElement} from './generic-form-object-functions';
 
 export class SubscriptionList {
 
   private subscriptions: Subscription[] = [];
 
-  public onData: ()=>void;
+  public onData: () => void;
 
   public constructor() {
   }
 
-  public get length(){
+  public get length() {
     return this.subscriptions.length;
   }
 
   public subscribe(observable: Observable<any>, callback: (data: any) => void) {
-    this.subscriptions.push(observable.subscribe((data)=>{
+    this.subscriptions.push(observable.subscribe((data) => {
       callback(data);
       this.onData?.();
     }));
@@ -44,7 +44,7 @@ const promiseAsObservable = (source: Promise<any>) => {
   });
 };
 
-const convertPrimitive = (source: FormDefElement, subscriptionList: SubscriptionList) => {
+const convertPrimitive = <T extends FormDefObjectElement>(source: T, subscriptionList: SubscriptionList) => {
   const result = {...source};
   if (result.type === 'selection') {
     if (result.options instanceof Promise) {
@@ -91,6 +91,11 @@ const walkObject = (source: FormDefinition, target: FormDefinition, subscription
       target[key] = {...source[key]};
       const targetArray = target[key] as FormDefArray;
       walkArray(def, targetArray, subscriptionList);
+    } else if (def.type === 'subform') {
+      target[key] = {...source[key]};
+      const targetObject = target[key] as FormDefSubform;
+      targetObject.content = {};
+      walkObject(def.content, targetObject.content, subscriptionList);
     } else {
       throw new Error('Not Implemented');
     }

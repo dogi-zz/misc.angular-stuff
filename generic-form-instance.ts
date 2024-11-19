@@ -13,13 +13,14 @@ import {
   FormDefCondition,
   FormDefinition,
   FormDefObject,
-  FormDefPrimitiveType,
+  FormDefPrimitive,
   FormModelArray,
   FormModelObject,
   FormModelValue,
   getCaption,
 } from './generic-form-definition';
 import {GenericFormModelInspector} from "./tools/generic-form-model-inspector";
+import * as _ from 'lodash';
 
 
 export type FormUiItemObject = { [key: string]: FormUiItem };
@@ -28,7 +29,7 @@ export type FormUiItem = FormUiItemPrimitiveItem |
   FormUiItemObjectItem |
   FormUiItemArrayItem;
 
-export type FormUiItemPrimitiveItem = { path: Path, type: 'input', caption: FormDefBaseElementCaption, inputType: string, def: FormDefPrimitiveType };
+export type FormUiItemPrimitiveItem = { path: Path, type: 'input', caption: FormDefBaseElementCaption, inputType: string, def: FormDefPrimitive };
 export type FormUiItemObjectItem = { path: Path, type: 'object', caption: FormDefBaseElementCaption, required: boolean, children: FormUiItemObject };
 export type FormUiItemArrayItem = { path: Path, type: 'array', caption: FormDefBaseElementCaption, required: boolean, canAdd: boolean, children: FormUiItemArray };
 
@@ -270,7 +271,7 @@ export class GenericFormInstance {
       }
 
       if (isPrimitiveElement(def)) {
-        this.analyzePrimitiveChild(target, key, def as FormDefPrimitiveType, inputModel, path, uiItems);
+        this.analyzePrimitiveChild(target, key, def as FormDefPrimitive, inputModel, path, uiItems);
 
       } else if (def.type === 'object') {
         this.analyzeObjectChild(target, key, def as FormDefObject, inputModel, path, uiItems);
@@ -278,9 +279,20 @@ export class GenericFormInstance {
       } else if (def.type === 'array') {
         this.analyzeArrayChild(target, key, def as FormDefArray, inputModel, path, uiItems);
 
+      } else if (def.type === 'subform') {
+
+        if (asFormDefBaseElementInline(def).inline) {
+          this.analyzeObject(target, def.content, inputModel, parentPath, uiItems);
+        } else {
+          const childUiItems: FormUiItemObject = {};
+          uiItems[key] = {path, type: 'object', caption: getCaption(def), required: true, children: childUiItems};
+          this.analyzeObject(target, def.content, inputModel, parentPath, childUiItems);
+        }
+
       } else {
         throw new Error('Not Implemented');
       }
+
     }
   }
 
@@ -294,7 +306,7 @@ export class GenericFormInstance {
     for (let idx = 0; idx < actualItems; idx++) {
       const path: Path = parentPath.child(idx);
       if (isPrimitiveElement(formDef.elements)) {
-        this.analyzePrimitiveChild(target, idx, formDef.elements as FormDefPrimitiveType, inputModel, path, uiItems);
+        this.analyzePrimitiveChild(target, idx, formDef.elements as FormDefPrimitive, inputModel, path, uiItems);
 
       } else if (formDef.elements.type === 'object') {
         this.analyzeObjectChild(target, idx, formDef.elements as FormDefObject & FormDefBaseElementInline, inputModel, path, uiItems);
@@ -307,6 +319,7 @@ export class GenericFormInstance {
       }
     }
   }
+
 
   private analyzeObjectChild(target: GenericFormInstanceObject | GenericFormInstanceArray, key: string | number, def: FormDefObject, inputModel: FormModelObject | FormModelArray, path: Path, uiItems: FormUiItemObject | FormUiItemArray) {
     let children: GenericFormInstanceObject;
@@ -398,8 +411,11 @@ export class GenericFormInstance {
   }
 
   private analyzePrimitiveChild(target: GenericFormInstanceObject | GenericFormInstanceArray, key: string | number,
-                                def: FormDefPrimitiveType, inputModel: FormModelObject | FormModelArray,
+                                def: FormDefPrimitive, inputModel: FormModelObject | FormModelArray,
                                 path: Path, uiItems: FormUiItemObject | FormUiItemArray) {
+
+    uiItems[key] = {path, type: 'input', caption: getCaption(def), inputType: def.type, def};
+
     if (target[key]?.visibility === 'true') {
       return;
     }
@@ -413,8 +429,6 @@ export class GenericFormInstance {
       this.calculationErrors.setValue(path, error);
     }
     target[key] = {type: 'primitive', path, actualValue, originalValue: inputModel?.[key], visibility: 'true'};
-
-    uiItems[key] = {path, type: 'input', caption: getCaption(def), inputType: def.type, def};
 
   }
 
@@ -505,7 +519,7 @@ export class GenericFormInstance {
       return 'true';
     }
     const conditionPath = resolveGlobalPath(parentPath, condition.path);
-    let conditionElement = this.calculatedResult;
+    let conditionElement: GenericFormInstanceObject | GenericFormInstanceArray = this.calculatedResult;
     let conditionValue: GenericFormInstanceValue;
     while (conditionPath.length) {
       conditionValue = conditionElement?.[conditionPath[0]];
@@ -517,6 +531,8 @@ export class GenericFormInstance {
         return 'n.a.';
       }
       if (conditionValue.type === 'object') {
+        conditionElement = conditionValue.children;
+      } else if (conditionValue.type === 'array') {
         conditionElement = conditionValue.children;
       } else {
         conditionElement = null;
@@ -530,6 +546,12 @@ export class GenericFormInstance {
 
 
   private checkConditionValue(condition: FormDefCondition, value: any): boolean {
+    if (condition.condition === 'in' ) {
+      return isArray(condition.value) && condition.value.includes(value);
+    }
+    if (condition.condition === 'not-in' ) {
+      return isArray(condition.value) && !condition.value.includes(value);
+    }
     if (condition.condition === 'eq' || !condition.condition) {
       return value === condition.value;
     }

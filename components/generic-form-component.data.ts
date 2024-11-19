@@ -1,7 +1,7 @@
 // tslint:disable:no-any
 
 import {BehaviorSubject, Observable} from 'rxjs';
-import {FormDefElementSelectOption, FormDefPrimitiveType} from "../generic-form-definition";
+import {FormDefElementSelectOption, FormDefPrimitive} from "../generic-form-definition";
 import {Path} from "../tools/generic-form-path";
 
 export type ButtonType = 'CreateObject' | 'RemoveObject' | 'CreateArray' | 'RemoveArray' | 'AddToArray' | 'RemoveFromArray';
@@ -31,7 +31,7 @@ export type WidgetControl = {
   onFocus: () => void,
   onBlur: () => void,
   onInput: (value: any) => void,
-  def: FormDefPrimitiveType;
+  def: FormDefPrimitive;
   path: Path;
   // required?: boolean;
   // min?: number;
