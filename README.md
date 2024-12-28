@@ -5,7 +5,7 @@
 
 ## Generic Form
 
-<a href="https://dogi-zz.github.io/misc.angular-stuff/?page=form" target="_blank">See in Action</a>
+<a href="https://dogi-zz.github.io/misc.angular-stuff/#/form/form1" target="_blank">See in Action</a>
 
 Features:
 
@@ -29,13 +29,19 @@ Features:
 
 ## Split bar
 
-<a href="https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar" target="_blank">See in Action</a>
+<a href="https://dogi-zz.github.io/misc.angular-stuff/#/panel" target="_blank">See in Action</a>
 
 For resizing issues (e.g. table columns) a simple bar, that can be moved (in a position:relative/absolute environment), and fires events when the user does so.
 
 ## Info Panel
 
-<a href="https://dogi-zz.github.io/misc.angular-stuff/?page=split_bar" target="_blank">See in Action</a>
+<a href="https://dogi-zz.github.io/misc.angular-stuff/#/panel" target="_blank">See in Action</a>
 
 When you want to show infos on a position:relative/absolute environment, that possibly covers something, and want it to move when the mouse comes in.
 
+
+## Grid Builder
+
+<a href="https://dogi-zz.github.io/misc.angular-stuff/#/layout" target="_blank">See in Action</a>
+
+A Library that enables to create a Customizable Grid.
