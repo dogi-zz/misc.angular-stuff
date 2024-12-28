@@ -23,6 +23,10 @@ export const initForm = (formDef: FormDefinition, model: any) => {
 };
 
 
+export const selectObjectByCaption = (caption: string) => {
+  return `.generic-form-input-object:has(.generic-form-title:contains("${caption}"))`;
+};
+
 export const selectInputByCaption = (caption: string) => {
   return `.generic-form-control:has(.generic-form-title:contains("${caption}"))`;
 };

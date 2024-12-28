@@ -7,7 +7,6 @@
     "preview:pre": "if [ -d 'docs' ]; then rm -rf docs; fi",
     "preview:post": "cp -a dist/misc.angular-stuff docs",
     "preview": "npm run preview:pre && ng build --base-href /misc.angular-stuff/ && npm run preview:post",
-    "build": "npm run preview && npm run dist:lib",
     "push": "git push origin main:main && git push origin main:angular-16",
     "watch": "ng build --watch --configuration development",
     "test": "jest --watch",
