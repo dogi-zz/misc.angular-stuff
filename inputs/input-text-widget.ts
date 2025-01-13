@@ -41,7 +41,7 @@ export class InputTextWidget extends GenericFormComponentBase {
   }
 
   public override ngOnInit(): void {
-    this.uiConverter = UiConverters.text;
+    this.uiConverter = UiConverters[`text`];
     super.ngOnInit();
   }
 

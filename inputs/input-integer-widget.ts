@@ -46,7 +46,7 @@ export class InputIntegerWidget extends GenericFormComponentBase {
   }
 
   public override ngOnInit(): void {
-    this.uiConverter = UiConverters.integer;
+    this.uiConverter = UiConverters[`integer`];
     super.ngOnInit();
   }
 

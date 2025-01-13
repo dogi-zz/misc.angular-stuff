@@ -1,6 +1,6 @@
 // tslint:disable:no-any
 
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, TrackByFunction, ViewChild} from '@angular/core';
+import {Component, EventEmitter, ElementRef, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, TrackByFunction, ViewChild} from '@angular/core';
 import {SafeUrl} from '@angular/platform-browser';
 import {BehaviorSubject, Subscription} from 'rxjs';
 import {ButtonControl, ButtonType, WidgetControl} from './components/generic-form-component.data';
@@ -13,46 +13,49 @@ import {getJson} from "./tools/generic-form-object-functions";
   template: `
     <div class="generic-form">
       <div generic-form-form class="generic-form-form" [uiItems]="actualUiItems"></div>
+      <ng-container *ngIf="formButtons">
+        <ng-template [ngTemplateOutlet]="formButtons"></ng-template>
+      </ng-container>
     </div>
 
-    <ng-template #buttonCreateObject [typedTemplate]="buttonControlTypeTemplate" let-control>
+    <ng-template #buttonCreateObject let-control>
       <img class="add-button" [src]="addButtonSource|async" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
-    <ng-template #buttonRemoveObject [typedTemplate]="buttonControlTypeTemplate" let-control>
+    <ng-template #buttonRemoveObject let-control>
       <img class="add-button" [src]="removeButtonSource|async" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
-    <ng-template #buttonAddToArray [typedTemplate]="buttonControlTypeTemplate" let-control>
+    <ng-template #buttonAddToArray let-control>
       <img class="add-button" [src]="addToArraySource|async" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
-    <ng-template #buttonRemoveFromArray [typedTemplate]="buttonControlTypeTemplate" let-control>
+    <ng-template #buttonRemoveFromArray let-control>
       <img class="add-button" [src]="removeFromArraySource|async" (mouseenter)="control.mouseEnter()" (mouseleave)="control.mouseLeave()"
            (mousedown)="control.action()"/>
     </ng-template>
 
 
-    <ng-template #inputSelect [typedTemplate]="widgetControlTypeTemplate" let-control>
+    <ng-template #inputSelect let-control>
       <div class="generic-form-input" app-input-selection-widget [control]="control"></div>
     </ng-template>
 
-    <ng-template #inputBoolean [typedTemplate]="widgetControlTypeTemplate" let-control>
+    <ng-template #inputBoolean let-control>
       <div class="generic-form-input" app-input-boolean-widget [control]="control"></div>
     </ng-template>
 
-    <ng-template #inputInteger [typedTemplate]="widgetControlTypeTemplate" let-control>
+    <ng-template #inputInteger let-control>
       <div class="generic-form-input" app-input-integer-widget [control]="control"></div>
     </ng-template>
 
-    <ng-template #inputNumber [typedTemplate]="widgetControlTypeTemplate" let-control>
+    <ng-template #inputNumber let-control>
       <div class="generic-form-input" app-input-number-widget [control]="control"></div>
     </ng-template>
 
-    <ng-template #inputText [typedTemplate]="widgetControlTypeTemplate" let-control>
+    <ng-template #inputText let-control>
       <div class="generic-form-input" app-input-text-widget [control]="control"></div>
     </ng-template>
 
@@ -87,11 +90,12 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   // @Input()
   // public getElementLayout: (control: ControlDef, isEmpty: boolean) => TemplateRef<ElementLayout>;
 
-  public widgetControlTypeTemplate: { $implicit: WidgetControl };
-  public buttonControlTypeTemplate: { $implicit: ButtonControl };
-
   @Input()
   public getAsset: (asset: string) => Promise<string | SafeUrl> = (image: string) => Promise.resolve(`./assets/generic-form/${image}`)
+
+  @Input()
+  public formButtons: TemplateRef<ElementRef<HTMLElement>>;
+
 
   @Output()
   public modelChange = new EventEmitter<any>();
@@ -161,7 +165,7 @@ export class GenericFormComponent implements OnInit, OnChanges, OnDestroy {
   public ngOnChanges(changes: SimpleChanges) {
     this.formInstance?.unsubscribe();
     this.formStateSubscription?.unsubscribe();
-    if (changes.formDef || changes.model) {
+    if (changes[`formDef`] || changes[`model`]) {
       this.formInstance = new GenericFormInstance(this.formDef, this.model);
       this.formStateSubscription = this.formInstance.updateState.subscribe(() => {
         if (!this.updateStopped) {

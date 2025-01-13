@@ -20,7 +20,6 @@ import {
   getCaption,
 } from './generic-form-definition';
 import {GenericFormModelInspector} from "./tools/generic-form-model-inspector";
-import * as _ from 'lodash';
 
 
 export type FormUiItemObject = { [key: string]: FormUiItem };
@@ -394,12 +393,12 @@ export class GenericFormInstance {
       if (!this.calculationErrors.hasValue(path)) {
         if (typeof def.minLength === 'number') {
           if (children.length < def.minLength) {
-            this.calculationErrors.setValue(path, ValidationTexts.arrayMin.replace('${}', `${UiConverters.number.toString(def.minLength)}`));
+            this.calculationErrors.setValue(path, ValidationTexts.arrayMin.replace('${}', `${UiConverters[`number`].toString(def.minLength)}`));
           }
         }
         if (typeof def.maxLength === 'number') {
           if (children.length > def.maxLength) {
-            this.calculationErrors.setValue(path, ValidationTexts.arrayMax.replace('${}', `${UiConverters.number.toString(def.maxLength)}`));
+            this.calculationErrors.setValue(path, ValidationTexts.arrayMax.replace('${}', `${UiConverters[`number`].toString(def.maxLength)}`));
           }
         }
       }

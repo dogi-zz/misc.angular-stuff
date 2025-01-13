@@ -40,7 +40,7 @@ export class InputNumberWidget extends GenericFormComponentBase {
   }
 
   public override ngOnInit(): void {
-    this.uiConverter = UiConverters.number;
+    this.uiConverter = UiConverters[`number`];
     super.ngOnInit();
   }
 

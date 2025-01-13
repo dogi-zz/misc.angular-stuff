@@ -7,7 +7,7 @@ export class Path {
   private _string: string;
 
   public constructor(
-    public items: PathItems,
+      public items: PathItems,
   ) {
   }
 
@@ -114,6 +114,7 @@ export class PathMap<T> {
       return false;
     });
   }
+
   public deleteValue(path: Path) {
     this.items = this.items.filter(item => !item.path.equals(path));
   }
@@ -129,7 +130,7 @@ export class PathMap<T> {
     this.items.forEach(item => {
       if (item.path.startsWith(parent)) {
         if (typeof item.path.items[parent.items.length] === 'number') {
-          if (item.path.items[parent.items.length] > index) {
+          if (typeof item.path.items[parent.items.length] === 'number' && item.path.items[parent.items.length] as number > index) {
             item.path.items[parent.items.length] = (item.path.items[parent.items.length] as number) - 1;
             item.path.invalidate();
           }
@@ -139,7 +140,7 @@ export class PathMap<T> {
     this.recalculateItemMap();
   }
 
-  public forEach(callback: (path: Path, value: T)=>void){
+  public forEach(callback: (path: Path, value: T) => void) {
     this.items.forEach(item => {
       callback(item.path, item.value);
     });
